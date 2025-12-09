@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   setSearchQuery,
@@ -138,7 +138,7 @@ export const useMoviesStore = () => {
         );
 
         dispatch(setMovies(moviesData));
-        
+
         // Reset pagination for search results
         dispatch(
           setPagination({
@@ -147,7 +147,7 @@ export const useMoviesStore = () => {
             hasMore: false,
           }),
         );
-        
+
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to search movies';
@@ -226,34 +226,62 @@ export const useMoviesStore = () => {
     [dispatch],
   );
 
-  return {
-    // State
-    movies,
-    filteredMovies,
-    selectedMovie,
-    genres,
+  return useMemo(() => {
+    return {
+      // State
+      movies,
+      filteredMovies,
+      selectedMovie,
+      genres,
+      status,
+      error,
+      currentPage,
+      totalPages,
+      hasMore,
+      filters,
+
+      // Async actions
+      loadPopularMovies,
+      loadMorePopularMovies,
+      searchMovies,
+      loadMovieDetails,
+
+      // Sync actions
+      setSearchQuery: setSearchQueryHandler,
+      setSelectedGenreId: setSelectedGenreIdHandler,
+      setSelectedYear: setSelectedYearHandler,
+      setSelectedRating: setSelectedRatingHandler,
+      setSelectedMovie: setSelectedMovieHandler,
+      updateFilters: updateFiltersHandler,
+      clearSearch: clearSearchHandler,
+    };
+  }, [
+    // Only include primitives and small arrays
+    movies.length,
+    filteredMovies.length,
+    selectedMovie?.id,
+    genres.length,
     status,
     error,
     currentPage,
     totalPages,
     hasMore,
-    filters,
-
-    // Async actions
+    filters.searchQuery,
+    filters.selectedGenreId,
+    filters.selectedYear,
+    filters.selectedRating,
     loadPopularMovies,
     loadMorePopularMovies,
     searchMovies,
     loadMovieDetails,
-
-    // Sync actions
-    setSearchQuery: setSearchQueryHandler,
-    setSelectedGenreId: setSelectedGenreIdHandler,
-    setSelectedYear: setSelectedYearHandler,
-    setSelectedRating: setSelectedRatingHandler,
-    setSelectedMovie: setSelectedMovieHandler,
-    updateFilters: updateFiltersHandler,
-    clearSearch: clearSearchHandler,
-  };
+    setSearchQueryHandler,
+    setSelectedGenreIdHandler,
+    setSelectedYearHandler,
+    setSelectedRatingHandler,
+    setSelectedMovieHandler,
+    updateFiltersHandler,
+    clearSearchHandler,
+  ]);
 };
 
 export type MoviesStore = ReturnType<typeof useMoviesStore>;

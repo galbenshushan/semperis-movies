@@ -46,14 +46,7 @@ export const useMoviesListPage = () => {
       // No query and no filters – fallback to popular Marvel movies
       loadPopularMovies(1);
     }
-  }, [
-    filters.searchQuery,
-    filters.selectedGenreId,
-    filters.selectedYear,
-    filters.selectedRating,
-    searchMovies,
-    loadPopularMovies,
-  ]);
+  }, [filters, searchMovies, loadPopularMovies]);
 
   // Throttle delay for scroll events (in milliseconds)
   const SCROLL_THROTTLE_DELAY = 500;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { CastMember } from '../../../types/movie';
 
 import {
@@ -16,9 +16,21 @@ interface CastListProps {
 
 /**
  * CastList: Presentational component that displays movie cast members.
- * All data is passed as props, no logic or hooks.
  */
-export const CastList: React.FC<CastListProps> = ({ cast }) => {
+const CastListComponent: React.FC<CastListProps> = ({ cast }) => {
+  
+  // Memoize rendered cast items to prevent re-creating them on every render
+  const renderedCast = useMemo(
+    () =>
+      cast.map((member) => (
+        <CastItem key={member.id}>
+          <CastName>{member.name}</CastName>
+          {member.character && <CastCharacter>as {member.character}</CastCharacter>}
+        </CastItem>
+      )),
+    [cast],
+  );
+
   if (cast.length === 0) {
     return null;
   }
@@ -27,13 +39,15 @@ export const CastList: React.FC<CastListProps> = ({ cast }) => {
     <CastContainer>
       <CastTitle>Cast</CastTitle>
       <StyledCastList>
-        {cast.map((member) => (
-          <CastItem key={member.id}>
-            <CastName>{member.name}</CastName>
-            {member.character && <CastCharacter>as {member.character}</CastCharacter>}
-          </CastItem>
-        ))}
+        {renderedCast}
       </StyledCastList>
     </CastContainer>
   );
 };
+
+/**
+ * Wrap with React.memo to prevent re-renders unless the cast prop changes.
+ * This is important because CastList is called from MovieDetailsHero, and
+ * memoizing it prevents unnecessary re-renders when parent props change.
+ */
+export const CastList = React.memo(CastListComponent);
