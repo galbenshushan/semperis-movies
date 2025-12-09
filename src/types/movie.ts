@@ -11,6 +11,7 @@ export interface Movie {
   releaseDate: string;
   voteAverage: number;
   posterPath: string | null;
+  genres?: Array<{ id: number; name: string }>;
 }
 
 export interface MovieDetails extends Movie {

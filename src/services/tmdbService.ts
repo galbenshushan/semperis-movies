@@ -9,6 +9,7 @@ interface TMDBMovie {
   release_date: string;
   vote_average: number;
   poster_path: string | null;
+  genre_ids?: number[];
 }
 
 interface TMDBCreditsCast {
@@ -50,14 +51,29 @@ interface TMDBMoviesResponse {
 
 /**
  * Map TMDB movie response to our Movie interface
+ * Converts genre_ids to genre objects using the genres lookup
  */
-const mapTMDBMovieToMovie = (tmdbMovie: TMDBMovie): Movie => ({
-  id: tmdbMovie.id,
-  title: tmdbMovie.title,
-  releaseDate: tmdbMovie.release_date,
-  voteAverage: tmdbMovie.vote_average,
-  posterPath: tmdbMovie.poster_path,
-});
+const mapTMDBMovieToMovie = (
+  tmdbMovie: TMDBMovie,
+  genresLookup?: Array<{ id: number; name: string }>,
+): Movie => {
+  // Map genre_ids to genre objects
+  let genres: Array<{ id: number; name: string }> | undefined;
+  if (tmdbMovie.genre_ids && genresLookup) {
+    genres = tmdbMovie.genre_ids
+      .map((genreId) => genresLookup.find((g) => g.id === genreId))
+      .filter((g): g is { id: number; name: string } => g !== undefined);
+  }
+
+  return {
+    id: tmdbMovie.id,
+    title: tmdbMovie.title,
+    releaseDate: tmdbMovie.release_date,
+    voteAverage: tmdbMovie.vote_average,
+    posterPath: tmdbMovie.poster_path,
+    ...(genres && { genres }),
+  };
+};
 
 /**
  * Map TMDB credits response to extract director and cast
@@ -103,7 +119,10 @@ const mapTMDBMovieDetailsToMovieDetails = (
  * Fetch Marvel Studio movies from TMDB discover endpoint
  * Uses with_companies=420 to filter for Marvel Studios only
  */
-export const fetchPopularMarvelMovies = async (page: number = 1): Promise<Movie[]> => {
+export const fetchPopularMarvelMovies = async (
+  page: number = 1,
+  genres?: Array<{ id: number; name: string }>,
+): Promise<Movie[]> => {
   try {
     const params = new URLSearchParams({
       api_key: API_KEY,
@@ -120,7 +139,7 @@ export const fetchPopularMarvelMovies = async (page: number = 1): Promise<Movie[
     }
 
     const data: TMDBMoviesResponse = await response.json();
-    return data.results.map(mapTMDBMovieToMovie);
+    return data.results.map((tmdbMovie) => mapTMDBMovieToMovie(tmdbMovie, genres));
   } catch (error) {
     console.error('Error fetching popular Marvel movies:', error);
     throw error;
@@ -136,6 +155,7 @@ export const searchMovies = async (
   year?: number,
   minRating?: number,
   genreId?: number,
+  genres?: Array<{ id: number; name: string }>,
 ): Promise<Movie[]> => {
   try {
     const params = new URLSearchParams({
@@ -160,7 +180,7 @@ export const searchMovies = async (
     }
 
     const data: TMDBMoviesResponse = await response.json();
-    let movies = data.results.map(mapTMDBMovieToMovie);
+    let movies = data.results.map((tmdbMovie) => mapTMDBMovieToMovie(tmdbMovie, genres));
 
     // Apply minimum rating filter if specified
     if (minRating !== undefined) {
