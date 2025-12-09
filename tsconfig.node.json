@@ -18,7 +18,7 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    "erasableSyntaxOnly": false, // to ensure type-only imports are erased
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
