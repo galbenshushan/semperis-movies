@@ -1,22 +1,32 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from '@mui/material';
-import { useMoviesListPage } from '../../hooks/useMoviesListPage';
-import { MovieSearch } from '../../components/movies/MovieSearch';
+import { useMovies } from '../../hooks/useMovies';
+import { MoviesToolbar } from '../../components/movies/filters/MoviesToolbar';
 import { MovieCard } from '../../components/movies/MovieCard';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MoviesStatus } from '../../utils/enums';
-import {
-  ContentWrapper,
-  Title,
-  SearchSection,
-  GridContainer,
-} from './MoviesListPage.styled';
+import type { Movie } from '../../types/movie';
+import { ContentWrapper, SearchSection, GridContainer } from './MoviesListPage.styled';
 
 export const MoviesListPage: React.FC = () => {
-  const { movies, status, error } = useMoviesListPage();
+  const {
+    filteredMovies,
+    status,
+    error,
+    genres,
+    searchQuery,
+    setSearchQuery,
+    clearSearch,
+    selectedGenreId,
+    setSelectedGenreId,
+    selectedYear,
+    setSelectedYear,
+    selectedRating,
+    setSelectedRating,
+  } = useMovies();
   const navigate = useNavigate();
 
   const handleCardClick = (movieId: number) => {
@@ -26,29 +36,40 @@ export const MoviesListPage: React.FC = () => {
   return (
     <Container maxWidth="xl">
       <ContentWrapper>
-        <Title>Popular Movies</Title>
-
-        {/* Search Section */}
+        {/* Search and Filter Toolbar */}
         <SearchSection>
-          <MovieSearch />
+          <MoviesToolbar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            clearSearch={clearSearch}
+            genreOptions={genres}
+            selectedGenreId={selectedGenreId}
+            onGenreChange={setSelectedGenreId}
+            selectedYear={selectedYear}
+            onYearChange={setSelectedYear}
+            selectedRating={selectedRating}
+            onRatingChange={setSelectedRating}
+          />
         </SearchSection>
-
-        {/* Loading State */}
-        {status === MoviesStatus.Loading && <LoadingState />}
 
         {/* Error State */}
         {error && <ErrorState message="Failed to load movies" details={error} />}
+
         {/* Movies Grid */}
-        {status === MoviesStatus.Succeeded && movies.length > 0 && (
+        {filteredMovies.length > 0 && (
           <GridContainer>
-            {movies.map((movie) => (
+            {filteredMovies.map((movie: Movie) => (
               <MovieCard key={movie.id} movie={movie} onClick={() => handleCardClick(movie.id)} />
             ))}
           </GridContainer>
         )}
+
+        {/* Loading State - shown on initial load */}
+        {status === MoviesStatus.Loading && filteredMovies.length === 0 && <LoadingState />}
+
         {/* Empty State */}
-        {status === MoviesStatus.Succeeded && movies.length === 0 && (
-          <EmptyState message="No movies found. Try a different search." />
+        {status === MoviesStatus.Succeeded && filteredMovies.length === 0 && (
+          <EmptyState message="No movies found. Try adjusting your filters." />
         )}
       </ContentWrapper>
     </Container>
