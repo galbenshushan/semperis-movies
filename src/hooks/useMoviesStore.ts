@@ -16,7 +16,7 @@ import {
 } from '../store/moviesSlice';
 import * as selectors from '../store/moviesSelectors';
 import type { MovieDetails } from '../types/movie';
-import type { PartialFilters } from '../utils/moviesFilters';
+import type { PartialFilters } from '../types/filters';
 
 /**
  * Thin facade over Redux state and actions for movies.

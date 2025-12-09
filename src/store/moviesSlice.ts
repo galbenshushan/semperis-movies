@@ -7,8 +7,7 @@ import {
 } from '../services/tmdbService';
 import { MoviesStatus } from '../utils/enums';
 import type { Movie, MovieDetails } from '../types/movie';
-import type { PartialFilters } from '../utils/moviesFilters';
-
+import type { PartialFilters } from '../types/filters';
 export interface Genre {
   id: number;
   name: string;
