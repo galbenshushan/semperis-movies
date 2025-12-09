@@ -11,9 +11,7 @@ import {
   HeroMetaRow,
   RatingBadge,
   RuntimeText,
-  OverviewText,
   GenresContainer,
-  GenreChip,
   DirectorContainer,
   DirectorLabel,
   DirectorName,
@@ -22,7 +20,10 @@ import {
   TMDBButton,
   ReleaseDate,
   SynopsisTitle,
+  OverviewText,
 } from '../../../pages/MovieDetailsPage/MovieDetailsPage.styled';
+import { useMovieDetailsHeroMemo } from '../../../hooks/useMovieDetailsHeroMemo';
+import { GenreChipList } from './GenreChipList';
 import { CastList } from './CastList';
 import type { CastMember } from '../../../types/movie';
 
@@ -45,7 +46,7 @@ interface MovieDetailsHeroProps {
 /**
  * MovieDetailsHero: Presentational component that displays full movie details.
  */
-export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
+const MovieDetailsHeroComponent: React.FC<MovieDetailsHeroProps> = ({
   backdropUrl,
   posterUrl,
   title,
@@ -60,6 +61,15 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
   onBack,
   onOpenTmdb,
 }) => {
+  // Use the custom hook to get all memoized computed values
+  const { ratingString, runtimeString, releaseYearString, memoizedOverview } =
+    useMovieDetailsHeroMemo({
+      genres,
+      voteAverage,
+      runtime,
+      releaseYear,
+      overview,
+    });
   return (
     <HeroSection $backdropUrl={backdropUrl}>
       <HeroContent>
@@ -76,9 +86,9 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
             <HeroTitle>{title}</HeroTitle>
 
             <HeroMetaRow>
-              <RatingBadge>★ {voteAverage.toFixed(1)}/10</RatingBadge>
-              {runtime > 0 && <RuntimeText>{runtime} min</RuntimeText>}
-              {releaseYear && <RuntimeText>({releaseYear})</RuntimeText>}
+              <RatingBadge>{ratingString}</RatingBadge>
+              {runtime > 0 && <RuntimeText>{runtimeString}</RuntimeText>}
+              {releaseYear && <RuntimeText>{releaseYearString}</RuntimeText>}
             </HeroMetaRow>
 
             {formattedReleaseDate && <ReleaseDate>Released: {formattedReleaseDate}</ReleaseDate>}
@@ -86,17 +96,15 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
             {genres.length > 0 && (
               <div>
                 <GenresContainer>
-                  {genres.map((genre) => (
-                    <GenreChip key={genre.id} label={genre.name} size="small" />
-                  ))}
+                  <GenreChipList genres={genres} />
                 </GenresContainer>
               </div>
             )}
 
-            {overview && (
+            {memoizedOverview && (
               <div>
                 <SynopsisTitle>Synopsis</SynopsisTitle>
-                <OverviewText>{overview}</OverviewText>
+                <OverviewText>{memoizedOverview}</OverviewText>
               </div>
             )}
 
@@ -119,3 +127,10 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
     </HeroSection>
   );
 };
+
+/**
+ * Wrap with React.memo to prevent re-renders unless props change.
+ * This is crucial because it prevents re-rendering when the parent (MovieDetailsPage)
+ * re-renders for unrelated reasons.
+ */
+export const MovieDetailsHero = React.memo(MovieDetailsHeroComponent);
