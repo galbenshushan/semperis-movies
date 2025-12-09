@@ -18,6 +18,8 @@ export const MovieDetailsPage: React.FC = () => {
     backdropUrl,
     releaseYear,
     formattedReleaseDate,
+    director,
+    cast,
     handleBack,
     handleGoHome,
     handleOpenTMDB,
@@ -68,6 +70,8 @@ export const MovieDetailsPage: React.FC = () => {
           formattedReleaseDate={formattedReleaseDate}
           genres={selectedMovie.genres}
           overview={selectedMovie.overview}
+          director={director}
+          cast={cast}
           onBack={handleBack}
           onOpenTmdb={handleOpenTMDB}
         />

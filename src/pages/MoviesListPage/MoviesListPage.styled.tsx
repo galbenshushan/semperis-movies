@@ -4,15 +4,6 @@ export const ContentWrapper = styled.div`
   padding: 32px 0;
 `;
 
-export const Title = styled.h1`
-  margin: 0 0 32px 0;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-`;
-
 export const SearchSection = styled.div`
   margin-bottom: 40px;
   display: flex;

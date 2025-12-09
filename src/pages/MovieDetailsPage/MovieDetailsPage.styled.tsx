@@ -313,20 +313,123 @@ export const Overview = styled.p`
   }
 `;
 
-// Actions section
-export const ActionsSection = styled.div`
+// Overview text (alternative naming for compatibility)
+export const OverviewText = styled.p`
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #d0d0d0;
+  margin: 0;
+  max-width: 700px;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+`;
+
+// Runtime text
+export const RuntimeText = styled.span`
+  font-size: 0.95rem;
+  color: #d0d0d0;
+  font-weight: 500;
+`;
+
+// Director section
+export const DirectorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(230, 36, 41, 0.08);
+  border-left: 3px solid #e62429;
+  border-radius: 4px;
+`;
+
+// Director label
+export const DirectorLabel = styled.span`
+  font-size: 0.9rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+`;
+
+// Director name
+export const DirectorName = styled.p`
+  font-size: 1.1rem;
+  color: #ffffff;
+  font-weight: 600;
+  margin: 0;
+`;
+
+// Cast section
+export const CastContainer = styled.div`
+  margin-top: 24px;
+`;
+
+// Cast title
+export const CastTitle = styled.h3`
+  font-size: 0.95rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+`;
+
+// Cast list
+export const CastList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+// Cast item
+export const CastItem = styled.div`
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(230, 36, 41, 0.3);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(230, 36, 41, 0.1);
+    border-color: #e62429;
+  }
+`;
+
+// Cast name
+export const CastName = styled.p`
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+`;
+
+// Button container
+export const ButtonContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-top: 8px;
+  margin-top: 24px;
 
   @media (max-width: 480px) {
     gap: 12px;
   }
 `;
 
-// Primary button (Back)
-export const PrimaryButton = styled(Button)`
+// Back button
+export const BackButton = styled(Button)`
   && {
     background: linear-gradient(135deg, #e62429 0%, #cc1f23 100%);
     color: #ffffff;
@@ -375,8 +478,8 @@ export const PrimaryButton = styled(Button)`
   }
 `;
 
-// Secondary button (TMDB)
-export const SecondaryButton = styled(Button)`
+// TMDB button
+export const TMDBButton = styled(Button)`
   && {
     border: 2px solid #e62429;
     color: #e62429;
