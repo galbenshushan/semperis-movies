@@ -5,8 +5,8 @@ import { ThemeProvider } from '@mui/material/styles';
 
 import { GlobalStyles } from './theme/GlobalStyles';
 import { muiTheme } from './theme/muiTheme';
-import { MoviesProvider } from './context/MoviesContext';
 import App from './App.tsx';
+import { MoviesProvider } from './context/MoviesContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
