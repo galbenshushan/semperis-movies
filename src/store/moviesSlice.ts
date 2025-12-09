@@ -1,10 +1,4 @@
-import { createSlice, createAsyncThunk, isAnyOf, type PayloadAction } from '@reduxjs/toolkit';
-import {
-  fetchPopularMarvelMovies,
-  searchMovies as searchMoviesService,
-  fetchMovieDetails,
-  fetchGenres,
-} from '../services/tmdbService';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { MoviesStatus } from '../utils/enums';
 import type { Movie, MovieDetails } from '../types/movie';
 import type { PartialFilters } from '../types/filters';
@@ -41,104 +35,6 @@ const initialState: MoviesState = {
   selectedGenreId: null,
   selectedYear: null,
   selectedRating: null,
-};
-
-// Async thunks
-
-export const fetchPopularMovies = createAsyncThunk<
-  Movie[],
-  number,
-  { state: { movies: MoviesState }; rejectValue: string }
->('movies/fetchPopularMovies', async (page, { getState, rejectWithValue }) => {
-  try {
-    const { movies: moviesState } = getState();
-    const moviesData = await fetchPopularMarvelMovies(page, moviesState.genres);
-    return moviesData;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to load popular movies';
-    return rejectWithValue(errorMessage);
-  }
-});
-
-export const fetchMorePopularMovies = createAsyncThunk<
-  Movie[],
-  number,
-  { state: { movies: MoviesState }; rejectValue: string }
->('movies/fetchMorePopularMovies', async (page, { getState, rejectWithValue }) => {
-  try {
-    const { movies: moviesState } = getState();
-    const moviesData = await fetchPopularMarvelMovies(page, moviesState.genres);
-    return moviesData;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to load more movies';
-    return rejectWithValue(errorMessage);
-  }
-});
-
-export const searchMovies = createAsyncThunk<
-  Movie[],
-  { query: string; page: number },
-  { state: { movies: MoviesState }; rejectValue: string }
->('movies/searchMovies', async ({ query, page }, { getState, rejectWithValue }) => {
-  try {
-    const { movies: moviesState } = getState();
-    const moviesData = await searchMoviesService(
-      query,
-      page,
-      moviesState.selectedYear || undefined,
-      moviesState.selectedRating || undefined,
-      moviesState.selectedGenreId || undefined,
-      moviesState.genres,
-    );
-    return moviesData;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to search movies';
-    return rejectWithValue(errorMessage);
-  }
-});
-
-export const fetchMovieDetailsThunk = createAsyncThunk<
-  MovieDetails | null,
-  number,
-  { rejectValue: string }
->('movies/fetchMovieDetails', async (id, { rejectWithValue }) => {
-  try {
-    const movieDetails = await fetchMovieDetails(id);
-    return movieDetails;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Failed to load movie details';
-    return rejectWithValue(errorMessage);
-  }
-});
-
-export const fetchGenresThunk = createAsyncThunk<Genre[], void, { rejectValue: string }>(
-  'movies/fetchGenres',
-  async (_, { rejectWithValue }) => {
-    try {
-      const genresData = await fetchGenres();
-      return genresData;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load genres';
-      return rejectWithValue(errorMessage);
-    }
-  },
-);
-
-// Helper functions for common reducer logic
-
-const handleMoviesListFulfilled = (state: MoviesState, action: PayloadAction<Movie[]>) => {
-  state.movies = action.payload;
-  state.status = MoviesStatus.Succeeded;
-};
-
-const handleMoreMoviesFulfilled = (state: MoviesState, action: PayloadAction<Movie[]>) => {
-  // Deduplicate: create a Set of existing IDs, then filter out duplicates
-  const existingIds = new Set(state.movies.map((m) => m.id));
-  const newMovies = action.payload.filter((m) => !existingIds.has(m.id));
-  state.movies = [...state.movies, ...newMovies];
-  state.currentPage += 1;
-  state.hasMore = state.currentPage < state.totalPages;
-  state.status = MoviesStatus.Succeeded;
 };
 
 // Slice
@@ -185,64 +81,35 @@ const moviesSlice = createSlice({
         state.selectedRating = minRating;
       }
     },
-  },
-  extraReducers: (builder) => {
-    // Handle all pending thunks
-    builder.addMatcher(
-      isAnyOf(
-        fetchGenresThunk.pending,
-        fetchPopularMovies.pending,
-        fetchMorePopularMovies.pending,
-        searchMovies.pending,
-        fetchMovieDetailsThunk.pending,
-      ),
-      (state) => {
-        state.status = MoviesStatus.Loading;
-        state.error = null;
-      },
-    );
-
-    // Handle all rejected thunks
-    builder.addMatcher(
-      isAnyOf(
-        fetchGenresThunk.rejected,
-        fetchPopularMovies.rejected,
-        fetchMorePopularMovies.rejected,
-        searchMovies.rejected,
-        fetchMovieDetailsThunk.rejected,
-      ),
-      (state, action) => {
-        state.status = MoviesStatus.Failed;
-        state.error = action.payload || 'Request failed';
-      },
-    );
-
-    // Fulfilled handlers with specific logic
-    builder.addCase(fetchGenresThunk.fulfilled, (state, action) => {
+    setMovies: (state, action: PayloadAction<Movie[]>) => {
+      state.movies = action.payload;
+    },
+    appendMovies: (state, action: PayloadAction<Movie[]>) => {
+      const existingIds = new Set(state.movies.map((m) => m.id));
+      const newMovies = action.payload.filter((m) => !existingIds.has(m.id));
+      state.movies = [...state.movies, ...newMovies];
+    },
+    setGenres: (state, action: PayloadAction<Genre[]>) => {
       state.genres = action.payload;
-      state.status = MoviesStatus.Succeeded;
-    });
-
-    builder.addCase(fetchPopularMovies.fulfilled, (state, action) => {
-      handleMoviesListFulfilled(state, action);
-      state.currentPage = 1;
-      const calculatedTotalPages = Math.ceil(500 / 20);
-      state.totalPages = calculatedTotalPages;
-      state.hasMore = 1 < calculatedTotalPages;
-    });
-
-    builder.addCase(fetchMorePopularMovies.fulfilled, (state, action) => {
-      handleMoreMoviesFulfilled(state, action);
-    });
-
-    builder.addCase(searchMovies.fulfilled, (state, action) => {
-      handleMoviesListFulfilled(state, action);
-    });
-
-    builder.addCase(fetchMovieDetailsThunk.fulfilled, (state, action) => {
-      state.selectedMovie = action.payload;
-      state.status = MoviesStatus.Succeeded;
-    });
+    },
+    setStatus: (state, action: PayloadAction<MoviesStatus>) => {
+      state.status = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
+    setPagination: (
+      state,
+      action: PayloadAction<{
+        currentPage: number;
+        totalPages: number;
+        hasMore: boolean;
+      }>,
+    ) => {
+      state.currentPage = action.payload.currentPage;
+      state.totalPages = action.payload.totalPages;
+      state.hasMore = action.payload.hasMore;
+    },
   },
 });
 
@@ -256,4 +123,10 @@ export const {
   setSelectedMovie,
   resetMovies,
   updateFilters,
+  setMovies,
+  appendMovies,
+  setGenres,
+  setStatus,
+  setError,
+  setPagination,
 } = moviesSlice.actions;
