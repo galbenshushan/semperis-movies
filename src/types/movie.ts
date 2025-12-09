@@ -10,6 +10,7 @@ export interface MovieDetails extends Movie {
   overview: string;
   genres: Array<{ id: number; name: string }>;
   runtime: number;
+  backdropPath?: string | null;
   director?: string;
   revenue?: number;
   budget?: number;

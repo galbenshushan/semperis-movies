@@ -15,6 +15,7 @@ interface TMDBMovieDetails extends TMDBMovie {
   overview: string;
   genres: Array<{ id: number; name: string }>;
   runtime: number;
+  backdrop_path?: string | null;
   director?: string;
   revenue?: number;
   budget?: number;
@@ -47,6 +48,7 @@ const mapTMDBMovieDetailsToMovieDetails = (tmdbMovie: TMDBMovieDetails): MovieDe
   releaseDate: tmdbMovie.release_date,
   voteAverage: tmdbMovie.vote_average,
   posterPath: tmdbMovie.poster_path,
+  backdropPath: tmdbMovie.backdrop_path,
   overview: tmdbMovie.overview,
   genres: tmdbMovie.genres,
   runtime: tmdbMovie.runtime,
