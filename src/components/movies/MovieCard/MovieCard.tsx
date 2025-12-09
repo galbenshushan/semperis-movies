@@ -1,35 +1,40 @@
 import React from 'react';
+import type { Movie } from '../../../types/movie';
 import {
-  StyledCard,
-  ImageContainer,
-  Image,
+  CardContainer,
+  PosterWrapper,
   NoImagePlaceholder,
-  ContentContainer,
+  CardContentWrapper,
   Title,
-  RatingText,
+  Year,
+  RatingBadge,
 } from './MovieCard.styled';
 
 interface MovieCardProps {
-  movieId: number;
-  title: string;
-  posterPath?: string;
-  rating?: number;
+  movie: Movie;
+  onClick: () => void;
 }
 
-export const MovieCard: React.FC<MovieCardProps> = ({ title, posterPath, rating }) => {
+export const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
+  const posterUrl = movie.posterPath ? `https://image.tmdb.org/t/p/w300${movie.posterPath}` : null;
+
+  const releaseYear = movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : 'N/A';
+  const rating = Math.round(movie.voteAverage * 10) / 10;
+
   return (
-    <StyledCard>
-      <ImageContainer>
-        {posterPath ? (
-          <Image src={posterPath} alt={title} />
+    <CardContainer onClick={onClick}>
+      <PosterWrapper>
+        {posterUrl ? (
+          <img src={posterUrl} alt={movie.title} loading="lazy" />
         ) : (
-          <NoImagePlaceholder>No Image</NoImagePlaceholder>
+          <NoImagePlaceholder>No Image Available</NoImagePlaceholder>
         )}
-      </ImageContainer>
-      <ContentContainer>
-        <Title>{title}</Title>
-        {rating && <RatingText>Rating: {rating}/10</RatingText>}
-      </ContentContainer>
-    </StyledCard>
+      </PosterWrapper>
+      <CardContentWrapper>
+        <Title>{movie.title}</Title>
+        <Year>{releaseYear}</Year>
+        <RatingBadge>★ {rating}</RatingBadge>
+      </CardContentWrapper>
+    </CardContainer>
   );
 };
