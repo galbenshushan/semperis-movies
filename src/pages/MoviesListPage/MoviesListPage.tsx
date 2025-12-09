@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from '@mui/material';
-import { useMovies } from '../../hooks/useMovies';
+import { useMoviesListPage } from '../../hooks/useMoviesListPage';
 import { MoviesToolbar } from '../../components/movies/filters/MoviesToolbar';
 import { MovieCard } from '../../components/movies/MovieCard';
 import { LoadingState } from '../../components/ui/LoadingState';
@@ -17,16 +17,13 @@ export const MoviesListPage: React.FC = () => {
     status,
     error,
     genres,
-    searchQuery,
+    filters,
     setSearchQuery,
     clearSearch,
-    selectedGenreId,
     setSelectedGenreId,
-    selectedYear,
     setSelectedYear,
-    selectedRating,
     setSelectedRating,
-  } = useMovies();
+  } = useMoviesListPage();
   const navigate = useNavigate();
 
   const handleCardClick = (movieId: number) => {
@@ -39,15 +36,15 @@ export const MoviesListPage: React.FC = () => {
         {/* Search and Filter Toolbar */}
         <SearchSection>
           <MoviesToolbar
-            searchQuery={searchQuery}
+            searchQuery={filters.searchQuery}
             onSearchChange={setSearchQuery}
             clearSearch={clearSearch}
             genreOptions={genres}
-            selectedGenreId={selectedGenreId}
+            selectedGenreId={filters.selectedGenreId}
             onGenreChange={setSelectedGenreId}
-            selectedYear={selectedYear}
+            selectedYear={filters.selectedYear}
             onYearChange={setSelectedYear}
-            selectedRating={selectedRating}
+            selectedRating={filters.selectedRating}
             onRatingChange={setSelectedRating}
           />
         </SearchSection>

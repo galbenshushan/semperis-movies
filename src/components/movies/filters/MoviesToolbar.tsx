@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { SearchInput } from './SearchInput';
 import { YearFilter } from './YearFilter';
 import { RatingFilter } from './RatingFilter';
-import type { Genre } from '../../../context/MoviesContext';
+import type { Genre } from '../../../store/moviesSlice';
 import { GenreFilter } from './GenreFilter';
 import { ToolbarContainer, FiltersWrapper } from './MoviesToolbar.styled';
 
