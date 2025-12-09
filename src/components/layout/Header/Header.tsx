@@ -22,7 +22,6 @@ export const Header: React.FC = () => {
           <NavLink as={Link} to="/">
             Movies
           </NavLink>
-          <NavLink>Comics</NavLink>
         </NavLeft>
 
         <LogoWrapper>
