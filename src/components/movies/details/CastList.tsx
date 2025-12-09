@@ -1,5 +1,12 @@
 import React from 'react';
-import { CastContainer, CastTitle, CastList as StyledCastList, CastItem, CastName, CastCharacter } from './CastList.styled';
+import {
+  CastContainer,
+  CastTitle,
+  CastList as StyledCastList,
+  CastItem,
+  CastName,
+  CastCharacter,
+} from './CastList.styled';
 import type { CastMember } from '../../../types/movie';
 
 interface CastListProps {
