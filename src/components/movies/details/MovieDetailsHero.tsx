@@ -6,23 +6,27 @@ import {
   PosterCard,
   PosterImage,
   PosterPlaceholder,
-  InfoSection,
   HeroInfoSection,
   HeroTitle,
   HeroMetaRow,
   RatingBadge,
-  MetaInfo,
+  RuntimeText,
+  OverviewText,
   GenresContainer,
   GenreChip,
-  OverviewSection,
-  SectionLabel,
-  Overview,
-  ActionsSection,
-  PrimaryButton,
-  SecondaryButton,
+  DirectorContainer,
+  DirectorLabel,
+  DirectorName,
+  ButtonContainer,
+  BackButton,
+  TMDBButton,
+  ReleaseDate,
+  SynopsisTitle,
 } from '../../../pages/MovieDetailsPage/MovieDetailsPage.styled';
+import { CastList } from './CastList';
+import type { CastMember } from '../../../types/movie';
 
-export interface MovieDetailsHeroProps {
+interface MovieDetailsHeroProps {
   backdropUrl: string | undefined;
   posterUrl: string | null;
   title: string;
@@ -32,13 +36,14 @@ export interface MovieDetailsHeroProps {
   formattedReleaseDate: string | null;
   genres: Array<{ id: number; name: string }>;
   overview: string;
+  director: string | null;
+  cast: CastMember[];
   onBack: () => void;
   onOpenTmdb: () => void;
 }
 
 /**
- * Presentational component that renders the full cinematic hero section with all movie details.
- * Receives all data and callbacks via props.
+ * MovieDetailsHero: Presentational component that displays full movie details.
  */
 export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
   backdropUrl,
@@ -50,6 +55,8 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
   formattedReleaseDate,
   genres,
   overview,
+  director,
+  cast,
   onBack,
   onOpenTmdb,
 }) => {
@@ -57,7 +64,6 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
     <HeroSection $backdropUrl={backdropUrl}>
       <HeroContent>
         <MainGrid>
-          {/* Floating Poster Card */}
           <PosterCard>
             {posterUrl ? (
               <PosterImage src={posterUrl} alt={title} loading="lazy" />
@@ -66,30 +72,19 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
             )}
           </PosterCard>
 
-          {/* Info Section: Title, metadata, genres, synopsis, actions */}
-          <InfoSection>
-            {/* Title and Basic Metadata */}
-            <HeroInfoSection>
-              <HeroTitle>{title}</HeroTitle>
-              <HeroMetaRow>
-                <RatingBadge>★ {voteAverage.toFixed(1)}/10</RatingBadge>
-                {runtime > 0 && <MetaInfo>{runtime} min</MetaInfo>}
-                {releaseYear && <MetaInfo>({releaseYear})</MetaInfo>}
-              </HeroMetaRow>
-            </HeroInfoSection>
+          <HeroInfoSection>
+            <HeroTitle>{title}</HeroTitle>
 
-            {/* Release Date */}
-            {formattedReleaseDate && (
-              <div>
-                <SectionLabel>Release Date</SectionLabel>
-                <MetaInfo>{formattedReleaseDate}</MetaInfo>
-              </div>
-            )}
+            <HeroMetaRow>
+              <RatingBadge>★ {voteAverage.toFixed(1)}/10</RatingBadge>
+              {runtime > 0 && <RuntimeText>{runtime} min</RuntimeText>}
+              {releaseYear && <RuntimeText>({releaseYear})</RuntimeText>}
+            </HeroMetaRow>
 
-            {/* Genres */}
+            {formattedReleaseDate && <ReleaseDate>Released: {formattedReleaseDate}</ReleaseDate>}
+
             {genres.length > 0 && (
               <div>
-                <SectionLabel>Genres</SectionLabel>
                 <GenresContainer>
                   {genres.map((genre) => (
                     <GenreChip key={genre.id} label={genre.name} size="small" />
@@ -98,20 +93,27 @@ export const MovieDetailsHero: React.FC<MovieDetailsHeroProps> = ({
               </div>
             )}
 
-            {/* Overview */}
             {overview && (
-              <OverviewSection>
-                <SectionLabel>Synopsis</SectionLabel>
-                <Overview>{overview}</Overview>
-              </OverviewSection>
+              <div>
+                <SynopsisTitle>Synopsis</SynopsisTitle>
+                <OverviewText>{overview}</OverviewText>
+              </div>
             )}
 
-            {/* Actions */}
-            <ActionsSection>
-              <PrimaryButton onClick={onBack}>← Back</PrimaryButton>
-              <SecondaryButton onClick={onOpenTmdb}>Open in TMDB ↗</SecondaryButton>
-            </ActionsSection>
-          </InfoSection>
+            {director && (
+              <DirectorContainer>
+                <DirectorLabel>Director</DirectorLabel>
+                <DirectorName>{director}</DirectorName>
+              </DirectorContainer>
+            )}
+
+            <CastList cast={cast} />
+
+            <ButtonContainer>
+              <BackButton onClick={onBack}>← Back</BackButton>
+              <TMDBButton onClick={onOpenTmdb}>View on TMDB ↗</TMDBButton>
+            </ButtonContainer>
+          </HeroInfoSection>
         </MainGrid>
       </HeroContent>
     </HeroSection>

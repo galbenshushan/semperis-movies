@@ -4,7 +4,7 @@ import { YearFilter } from './YearFilter';
 import { RatingFilter } from './RatingFilter';
 import type { Genre } from '../../../context/MoviesContext';
 import { GenreFilter } from './GenreFilter';
-import { ToolbarContainer } from './MoviesToolbar.styled';
+import { ToolbarContainer, FiltersWrapper } from './MoviesToolbar.styled';
 
 interface MoviesToolbarProps {
   searchQuery: string;
@@ -44,9 +44,11 @@ export const MoviesToolbar: React.FC<MoviesToolbarProps> = memo(
           onClear={clearSearch}
           placeholder="Search movies..."
         />
-        <GenreFilter options={genreOptions} value={selectedGenreId} onChange={onGenreChange} />
-        <YearFilter value={selectedYear} onChange={onYearChange} />
-        <RatingFilter value={selectedRating} onChange={onRatingChange} />
+        <FiltersWrapper>
+          <GenreFilter options={genreOptions} value={selectedGenreId} onChange={onGenreChange} />
+          <YearFilter value={selectedYear} onChange={onYearChange} />
+          <RatingFilter value={selectedRating} onChange={onRatingChange} />
+        </FiltersWrapper>
       </ToolbarContainer>
     );
   },

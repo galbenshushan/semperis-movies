@@ -542,3 +542,20 @@ export const NotFoundTitle = styled.h1`
     font-size: 2rem;
   }
 `;
+
+// Release date text
+export const ReleaseDate = styled.div`
+  font-size: 0.95rem;
+  color: #cccccc;
+`;
+
+// Synopsis title
+export const SynopsisTitle = styled.h3`
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: #cccccc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;

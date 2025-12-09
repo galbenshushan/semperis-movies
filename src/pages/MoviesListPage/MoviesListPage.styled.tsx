@@ -6,9 +6,10 @@ export const ContentWrapper = styled.div`
 
 export const SearchSection = styled.div`
   margin-bottom: 40px;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
 `;
 
 export const GridContainer = styled.div`
