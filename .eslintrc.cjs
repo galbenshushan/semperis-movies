@@ -13,16 +13,24 @@ module.exports = {
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react', 'react-hooks', 'import', 'simple-import-sort', '@typescript-eslint', 'prettier'],
+  plugins: [
+    'react',
+    'react-hooks',
+    'import',
+    'simple-import-sort',
+    '@typescript-eslint',
+    'prettier',
+  ],
   rules: {
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/consistent-type-imports': 'warn',
+    '@typescript-eslint/consistent-type-imports': 'error',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'prettier/prettier': 'error',
+    'import/no-unused-modules': ['warn', { unusedExports: true }],
   },
   settings: {
     react: {
