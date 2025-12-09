@@ -7,7 +7,7 @@ export const MovieDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="xl">
       <ContentWrapper>
         <Title>Movie Details</Title>
         <Description>Movie details for ID: {id} will be displayed here</Description>
