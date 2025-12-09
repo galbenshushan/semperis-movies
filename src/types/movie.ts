@@ -1,3 +1,10 @@
+export interface CastMember {
+  id: number;
+  name: string;
+  character?: string;
+  profilePath?: string | null;
+}
+
 export interface Movie {
   id: number;
   title: string;
@@ -11,7 +18,8 @@ export interface MovieDetails extends Movie {
   genres: Array<{ id: number; name: string }>;
   runtime: number;
   backdropPath?: string | null;
-  director?: string;
+  director?: string | null;
+  cast?: CastMember[];
   revenue?: number;
   budget?: number;
 }
