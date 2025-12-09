@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useMoviesStore } from './useMoviesStore';
 import { useWindowScroll } from './useWindowScroll';
-import { isNearBottom } from '../utils/scroll';
+import { isNearBottom, throttle } from '../utils/scroll';
 import { MoviesStatus } from '../utils/enums';
 
 /**
@@ -13,7 +13,15 @@ import { MoviesStatus } from '../utils/enums';
  */
 export const useMoviesListPage = () => {
   const store = useMoviesStore();
-  const { movies, status, hasMore, filters, loadPopularMovies, loadMorePopularMovies, searchMovies } = store;
+  const {
+    movies,
+    status,
+    hasMore,
+    filters,
+    loadPopularMovies,
+    loadMorePopularMovies,
+    searchMovies,
+  } = store;
 
   // Load initial movies on mount
   useEffect(() => {
@@ -23,18 +31,35 @@ export const useMoviesListPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle search query changes - call API instead of filtering locally
+  // Handle search query and filters changes - call API instead of filtering only locally
   useEffect(() => {
-    const { searchQuery } = filters;
-    
-    if (searchQuery.trim()) {
-      // User has entered a search query, fetch results from API
+    const { searchQuery, selectedGenreId, selectedYear, selectedRating } = filters;
+
+    const hasQuery = searchQuery.trim().length > 0;
+    const hasAnyFilter =
+      selectedGenreId !== null || selectedYear !== null || selectedRating !== null;
+
+    if (hasQuery || hasAnyFilter) {
+      // Any search signal (text or filters) – use deep searchMovies
       searchMovies(1);
     } else {
-      // No search query, show popular movies
+      // No query and no filters – fallback to popular Marvel movies
       loadPopularMovies(1);
     }
-  }, [filters.searchQuery, searchMovies, loadPopularMovies]);
+  }, [
+    filters.searchQuery,
+    filters.selectedGenreId,
+    filters.selectedYear,
+    filters.selectedRating,
+    searchMovies,
+    loadPopularMovies,
+  ]);
+
+  // Throttle delay for scroll events (in milliseconds)
+  const SCROLL_THROTTLE_DELAY = 500;
+
+  // Use ref to store the throttled handler to prevent recreation
+  const throttledHandlerRef = useRef<(() => void) | null>(null);
 
   // Memoized scroll handler
   const handleScroll = useCallback(() => {
@@ -47,8 +72,17 @@ export const useMoviesListPage = () => {
     }
   }, [status, hasMore, loadMorePopularMovies]);
 
-  // Attach scroll listener
-  useWindowScroll(handleScroll);
+  // Create throttled handler
+  useEffect(() => {
+    throttledHandlerRef.current = throttle(handleScroll, SCROLL_THROTTLE_DELAY);
+  }, [handleScroll]);
+
+  // Attach scroll listener with throttled handler
+  useWindowScroll(() => {
+    if (throttledHandlerRef.current) {
+      throttledHandlerRef.current();
+    }
+  });
 
   return store;
 };
