@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 // Main navbar container with Marvel-inspired dark theme
 export const HeaderContainer = styled.header`
@@ -34,11 +35,11 @@ export const NavLeft = styled.div`
   align-items: center;
   gap: 32px;
   flex: 1;
-  
+
   @media (max-width: 768px) {
     gap: 16px;
   }
-  
+
   @media (max-width: 480px) {
     display: none;
   }
@@ -50,7 +51,20 @@ export const LogoWrapper = styled.div`
   align-items: center;
   justify-content: center;
   flex: 1;
-  
+`;
+
+// Logo link with styling
+export const LogoLink = styled(Link)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
   img {
     height: 50px;
     width: auto;
@@ -65,7 +79,7 @@ export const NavActions = styled.div`
   gap: 16px;
   flex: 1;
   justify-content: flex-end;
-  
+
   @media (max-width: 480px) {
     gap: 8px;
   }
@@ -79,9 +93,12 @@ export const NavLink = styled.a`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
   cursor: pointer;
-  
+  display: inline-block;
+
   &:hover {
     color: #e62429;
     text-shadow: 0 0 10px rgba(230, 36, 41, 0.3);
@@ -101,14 +118,14 @@ export const MarvelButton = styled(Button)`
     border-radius: 4px;
     border: 2px solid #e62429;
     transition: all 0.3s ease;
-    
+
     &:hover {
       background-color: #cc1f24;
       border-color: #cc1f24;
       box-shadow: 0 4px 12px rgba(230, 36, 41, 0.4);
       transform: translateY(-2px);
     }
-    
+
     &:active {
       transform: translateY(0);
     }
@@ -128,14 +145,14 @@ export const MarvelButtonOutline = styled(Button)`
     border-radius: 4px;
     border: 2px solid #ffffff;
     transition: all 0.3s ease;
-    
+
     &:hover {
       background-color: #ffffff;
       color: #1b1b1b;
       box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
     }
-    
+
     &:active {
       transform: translateY(0);
     }

@@ -1,9 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   HeaderContainer,
   HeaderInner,
   LogoWrapper,
+  LogoLink,
+  NavLeft,
   NavActions,
+  NavLink,
   MarvelButton,
   MarvelButtonOutline,
 } from './Header.styled';
@@ -13,8 +17,18 @@ export const Header: React.FC = () => {
   return (
     <HeaderContainer>
       <HeaderInner>
+        <NavLeft>
+          <NavLink>Characters</NavLink>
+          <NavLink as={Link} to="/">
+            Movies
+          </NavLink>
+          <NavLink>Comics</NavLink>
+        </NavLeft>
+
         <LogoWrapper>
-          <img src={MarvelLogo} alt="Marvel Logo" />
+          <LogoLink to="/">
+            <img src={MarvelLogo} alt="Marvel Logo" />
+          </LogoLink>
         </LogoWrapper>
 
         <NavActions>
