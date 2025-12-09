@@ -56,11 +56,19 @@ const mapTMDBMovieDetailsToMovieDetails = (tmdbMovie: TMDBMovieDetails): MovieDe
 });
 
 /**
- * Fetch popular movies from TMDB
+ * Fetch Marvel Studio movies from TMDB discover endpoint
+ * Uses with_companies=420 to filter for Marvel Studios only
  */
-export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => {
+export const fetchPopularMarvelMovies = async (page: number = 1): Promise<Movie[]> => {
   try {
-    const url = `${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`;
+    const params = new URLSearchParams({
+      api_key: API_KEY,
+      with_companies: '420', // Marvel Studios ID
+      sort_by: 'popularity.desc',
+      page: page.toString(),
+    });
+
+    const url = `${BASE_URL}/discover/movie?${params.toString()}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -70,7 +78,7 @@ export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => 
     const data: TMDBMoviesResponse = await response.json();
     return data.results.map(mapTMDBMovieToMovie);
   } catch (error) {
-    console.error('Error fetching popular movies:', error);
+    console.error('Error fetching popular Marvel movies:', error);
     throw error;
   }
 };
