@@ -30,16 +30,12 @@ export const selectFilters = createSelector(
 );
 
 // Memoized filtered movies selector
+// Note: Search filtering is done via API call, not locally.
+// Local filtering is only applied for genre, year, and rating.
 export const selectFilteredMovies = createSelector(
   [selectMovies, selectFilters],
-  (movies, { searchQuery, selectedGenreId, selectedYear, selectedRating }) => {
+  (movies, { selectedGenreId, selectedYear, selectedRating }) => {
     let filtered = [...movies];
-
-    // Filter by search query (case-insensitive)
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((movie) => movie.title.toLowerCase().includes(query));
-    }
 
     // Filter by genre (using genres array if available)
     if (selectedGenreId !== null) {

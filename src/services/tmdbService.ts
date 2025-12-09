@@ -10,6 +10,8 @@ interface TMDBMovie {
   vote_average: number;
   poster_path: string | null;
   genre_ids?: number[];
+  production_companies?: Array<{ id: number; name: string }>;
+  genres?: Array<{ id: number; name: string }>;
 }
 
 interface TMDBCreditsCast {
@@ -148,6 +150,20 @@ export const fetchPopularMarvelMovies = async (
 
 /**
  * Search movies by query string with optional filters
+ * Always returns only Marvel Studios movies (company ID 420)
+ *
+ * Uses /discover/movie endpoint exclusively and applies server-side filters
+ * when possible (year, genre, rating). For text queries or when multiple
+ * filters are applied, fetches multiple pages and filters client-side to
+ * ensure comprehensive results.
+ *
+ * @param query - Optional text search to filter by title (client-side)
+ * @param page - Starting page number for pagination (default: 1)
+ * @param year - Optional release year filter (server-side)
+ * @param minRating - Optional minimum vote average filter (server-side)
+ * @param genreId - Optional genre ID filter (server-side)
+ * @param genres - Genre lookup array for mapping genre_ids to objects
+ * @returns Promise<Movie[]> - Array of Marvel Studios movies matching all criteria
  */
 export const searchMovies = async (
   query: string,
@@ -157,37 +173,116 @@ export const searchMovies = async (
   genreId?: number,
   genres?: Array<{ id: number; name: string }>,
 ): Promise<Movie[]> => {
+  const MAX_PAGES_TO_FETCH = 5;
+  const GOOD_ENOUGH_RESULTS = 60;
+
   try {
-    const params = new URLSearchParams({
-      api_key: API_KEY,
-      query,
-      page: page.toString(),
-    });
+    const trimmedQuery = query.trim();
+    const hasQuery = trimmedQuery.length > 0;
+    const hasFilters = year !== undefined || minRating !== undefined || genreId !== undefined;
 
-    if (year) {
-      params.append('primary_release_year', year.toString());
+    // Accumulator for all discovered Marvel movies
+    const allMarvelMovies: TMDBMovie[] = [];
+
+    // Build params for discover endpoint - always include Marvel Studios filter
+    const buildParams = (pageNum: number): URLSearchParams => {
+      const params = new URLSearchParams({
+        api_key: API_KEY,
+        with_companies: '420', // Marvel Studios ID
+        sort_by: 'popularity.desc',
+        page: pageNum.toString(),
+      });
+
+      // Apply server-side filters
+      if (year) {
+        params.append('primary_release_year', year.toString());
+      }
+
+      if (genreId) {
+        params.append('with_genres', genreId.toString());
+      }
+
+      if (minRating !== undefined) {
+        params.append('vote_average.gte', String(minRating));
+      }
+
+      return params;
+    };
+
+    // Fetch multiple pages if:
+    // 1. User provided a text query, OR
+    // 2. User applied any filters (year/genre/rating)
+    // This ensures we get comprehensive results instead of stopping at page 1
+    const shouldFetchMultiplePages = hasQuery || hasFilters;
+
+    if (shouldFetchMultiplePages) {
+      let currentPage = page;
+      let hasMorePages = true;
+
+      while (hasMorePages && currentPage - page < MAX_PAGES_TO_FETCH) {
+        const params = buildParams(currentPage);
+        const url = `${BASE_URL}/discover/movie?${params.toString()}`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`TMDB API error: ${response.status}`);
+        }
+
+        const data: TMDBMoviesResponse = await response.json();
+
+        // If no results on this page, stop fetching
+        if (!data.results.length) {
+          hasMorePages = false;
+          break;
+        }
+
+        // Add results to accumulator
+        allMarvelMovies.push(...data.results);
+
+        // Early exit if we have "enough" results and a text query exists
+        if (hasQuery && allMarvelMovies.length >= GOOD_ENOUGH_RESULTS) {
+          hasMorePages = false;
+          break;
+        }
+
+        // Check if there are more pages to fetch
+        if (currentPage >= data.total_pages) {
+          hasMorePages = false;
+          break;
+        }
+
+        currentPage++;
+      }
+    } else {
+      // No query and no filters - fetch just the requested page
+      const params = buildParams(page);
+      const url = `${BASE_URL}/discover/movie?${params.toString()}`;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`TMDB API error: ${response.status}`);
+      }
+
+      const data: TMDBMoviesResponse = await response.json();
+      allMarvelMovies.push(...data.results);
     }
 
-    if (genreId) {
-      params.append('with_genres', genreId.toString());
+    // If query is provided, filter accumulated movies on the client side by title
+    if (hasQuery) {
+      const queryLower = trimmedQuery.toLowerCase();
+      const filteredMovies = allMarvelMovies.filter((tmdbMovie) => {
+        // Match against title
+        return tmdbMovie.title.toLowerCase().includes(queryLower);
+      });
+
+      // Map filtered results to Movie type
+      return filteredMovies.map((tmdbMovie) => mapTMDBMovieToMovie(tmdbMovie, genres));
     }
 
-    const url = `${BASE_URL}/search/movie?${params.toString()}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`TMDB API error: ${response.status}`);
-    }
-
-    const data: TMDBMoviesResponse = await response.json();
-    let movies = data.results.map((tmdbMovie) => mapTMDBMovieToMovie(tmdbMovie, genres));
-
-    // Apply minimum rating filter if specified
-    if (minRating !== undefined) {
-      movies = movies.filter((movie) => movie.voteAverage >= minRating);
-    }
-
-    return movies;
+    // No query - return all accumulated movies (server-side filters already applied)
+    return allMarvelMovies.map((tmdbMovie) => mapTMDBMovieToMovie(tmdbMovie, genres));
   } catch (error) {
     console.error('Error searching movies:', error);
     throw error;

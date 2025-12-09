@@ -120,6 +120,7 @@ export const useMoviesStore = () => {
 
   /**
    * Search movies by query and filters.
+   * Resets pagination to page 1.
    */
   const searchMovies = useCallback(
     async (page: number = 1) => {
@@ -137,6 +138,16 @@ export const useMoviesStore = () => {
         );
 
         dispatch(setMovies(moviesData));
+        
+        // Reset pagination for search results
+        dispatch(
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            hasMore: false,
+          }),
+        );
+        
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to search movies';
