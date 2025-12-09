@@ -1,13 +1,14 @@
 import React from 'react';
-import {
-  CastContainer,
-  CastTitle,
-  CastList as StyledCastList,
-  CastItem,
-  CastName,
-  CastCharacter,
-} from './CastList.styled';
 import type { CastMember } from '../../../types/movie';
+
+import {
+  CastCharacter,
+  CastContainer,
+  CastItem,
+  CastList as StyledCastList,
+  CastName,
+  CastTitle,
+} from './CastList.styled';
 
 interface CastListProps {
   cast: CastMember[];
