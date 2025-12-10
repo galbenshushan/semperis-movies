@@ -13,8 +13,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Copy .env file for build
-COPY .env .env
+# Create .env file with API key for build
+RUN echo "VITE_TMDB_API_KEY=47acdc595ef154784a7346a111cab7da" > .env
 
 # Build the project
 RUN npm run build
