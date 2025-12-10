@@ -5,11 +5,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - VITE_TMDB_API_KEY=47acdc595ef154784a7346a111cab7da
     container_name: semperis-movies
     ports:
       - "8080:80"
     environment:
       - NODE_ENV=production
+      - VITE_TMDB_API_KEY=47acdc595ef154784a7346a111cab7da
     restart: unless-stopped
     networks:
       - app-network
