@@ -4,13 +4,15 @@
 
 /**
  * Check if the user has scrolled near the bottom of the page.
+ * Uses document.documentElement.scrollHeight for more reliable calculations.
  * @param threshold - Distance from bottom in pixels (default 300px)
  * @returns true if within threshold of bottom, false otherwise
  */
 export const isNearBottom = (threshold: number = 300): boolean => {
   const scrollPosition = window.innerHeight + window.scrollY;
-  const thresholdHeight = document.documentElement.offsetHeight - threshold;
-  return scrollPosition >= thresholdHeight;
+  const pageHeight = document.documentElement.scrollHeight;
+  const distanceFromBottom = pageHeight - scrollPosition;
+  return distanceFromBottom <= threshold;
 };
 
 /**

@@ -58,9 +58,13 @@ export const useMoviesListPage = () => {
   const handleScroll = useCallback(() => {
     // Only load more if:
     // - We're not already loading
-    // - There are more pages
+    // - There are more pages (indicates we're in popular/browse mode, not search)
     // - We're within 300px of the bottom
-    if (status !== MoviesStatus.Loading && hasMore && isNearBottom(300)) {
+    if (
+      status !== MoviesStatus.Loading &&
+      hasMore &&
+      isNearBottom(300)
+    ) {
       loadMorePopularMovies();
     }
   }, [status, hasMore, loadMorePopularMovies]);
