@@ -8,11 +8,13 @@ import type { TMDBMovie, TMDBMoviesResponse } from '../tmdbTypes';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY || '';
 
-// Validate API key at module load time
-if (!API_KEY || API_KEY.trim() === '') {
-  throw new Error(
-    'TMDB API key is missing or invalid. Please ensure VITE_TMDB_API_KEY is set in your environment variables.',
-  );
+/**
+ * Ensures TMDB API key is available before making requests
+ */
+function ensureTmdbApiKey(): void {
+  if (!API_KEY || API_KEY.trim() === '') {
+    throw new Error('TMDB_CONFIG_ERROR');
+  }
 }
 
 /**
@@ -29,6 +31,8 @@ export async function tmdbFetch<T>(
   path: string,
   params?: Record<string, string | number>,
 ): Promise<T> {
+  ensureTmdbApiKey();
+
   const url = new URL(`${BASE_URL}${path}`);
 
   // Always include API key

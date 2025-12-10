@@ -13,6 +13,7 @@ import {
   setGenres,
   setStatus,
   setError,
+  setConfigError,
   setPagination,
 } from '../store/moviesSlice';
 import {
@@ -45,6 +46,7 @@ export const useMoviesStore = () => {
   const genres = useAppSelector(selectors.selectGenres);
   const status = useAppSelector(selectors.selectStatus);
   const error = useAppSelector(selectors.selectError);
+  const configError = useAppSelector((state) => state.movies.configError);
   const currentPage = useAppSelector(selectors.selectCurrentPage);
   const totalPages = useAppSelector(selectors.selectTotalPages);
   const hasMore = useAppSelector(selectors.selectHasMore);
@@ -96,7 +98,16 @@ export const useMoviesStore = () => {
 
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
-        dispatch(setError(toErrorMessage(err, 'Failed to load popular movies')));
+        const errorMsg = toErrorMessage(err, 'Failed to load popular movies');
+        if (err instanceof Error && err.message === 'TMDB_CONFIG_ERROR') {
+          dispatch(
+            setConfigError(
+              'TMDB API key is missing or invalid. Please set VITE_TMDB_API_KEY in your environment variables.',
+            ),
+          );
+        } else {
+          dispatch(setError(errorMsg));
+        }
         dispatch(setStatus(MoviesStatus.Failed));
       }
     },
@@ -129,7 +140,16 @@ export const useMoviesStore = () => {
 
       dispatch(setStatus(MoviesStatus.Succeeded));
     } catch (err) {
-      dispatch(setError(toErrorMessage(err, 'Failed to load more movies')));
+      const errorMsg = toErrorMessage(err, 'Failed to load more movies');
+      if (err instanceof Error && err.message === 'TMDB_CONFIG_ERROR') {
+        dispatch(
+          setConfigError(
+            'TMDB API key is missing or invalid. Please set VITE_TMDB_API_KEY in your environment variables.',
+          ),
+        );
+      } else {
+        dispatch(setError(errorMsg));
+      }
       dispatch(setStatus(MoviesStatus.Failed));
     }
   }, [dispatch, status, hasMore, currentPage, genres, totalPages]);
@@ -168,7 +188,16 @@ export const useMoviesStore = () => {
 
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
-        dispatch(setError(toErrorMessage(err, 'Failed to search movies')));
+        const errorMsg = toErrorMessage(err, 'Failed to search movies');
+        if (err instanceof Error && err.message === 'TMDB_CONFIG_ERROR') {
+          dispatch(
+            setConfigError(
+              'TMDB API key is missing or invalid. Please set VITE_TMDB_API_KEY in your environment variables.',
+            ),
+          );
+        } else {
+          dispatch(setError(errorMsg));
+        }
         dispatch(setStatus(MoviesStatus.Failed));
       }
     },
@@ -188,7 +217,16 @@ export const useMoviesStore = () => {
         dispatch(setSelectedMovie(details));
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
-        dispatch(setError(toErrorMessage(err, 'Failed to load movie details')));
+        const errorMsg = toErrorMessage(err, 'Failed to load movie details');
+        if (err instanceof Error && err.message === 'TMDB_CONFIG_ERROR') {
+          dispatch(
+            setConfigError(
+              'TMDB API key is missing or invalid. Please set VITE_TMDB_API_KEY in your environment variables.',
+            ),
+          );
+        } else {
+          dispatch(setError(errorMsg));
+        }
         dispatch(setStatus(MoviesStatus.Failed));
       }
     },
@@ -257,6 +295,7 @@ export const useMoviesStore = () => {
       genres,
       status,
       error,
+      configError,
       currentPage,
       totalPages,
       hasMore,
@@ -285,6 +324,7 @@ export const useMoviesStore = () => {
       genres.length,
       status,
       error,
+      configError,
       currentPage,
       totalPages,
       hasMore,

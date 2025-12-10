@@ -13,6 +13,7 @@ const initialState: MoviesState = {
   hasMore: true,
   status: MoviesStatus.Idle,
   error: null,
+  configError: null,
   searchQuery: '',
   selectedGenreId: null,
   selectedYear: null,
@@ -80,6 +81,9 @@ const moviesSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setConfigError: (state, action: PayloadAction<string | null>) => {
+      state.configError = action.payload;
+    },
     setPagination: (
       state,
       action: PayloadAction<{
@@ -110,5 +114,6 @@ export const {
   setGenres,
   setStatus,
   setError,
+  setConfigError,
   setPagination,
 } = moviesSlice.actions;

@@ -15,6 +15,7 @@ export interface MoviesState {
   hasMore: boolean;
   status: MoviesStatus;
   error: string | null;
+  configError: string | null;
   searchQuery: string;
   selectedGenreId: number | null;
   selectedYear: number | null;
