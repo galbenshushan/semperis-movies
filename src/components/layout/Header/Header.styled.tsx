@@ -86,7 +86,7 @@ export const NavActions = styled.div`
 `;
 
 // Styled navigation links
-export const NavLink = styled.a`
+export const NavLink = styled.a<{ disabled?: boolean }>`
   color: #ffffff;
   text-decoration: none;
   font-size: 0.95rem;
@@ -95,14 +95,20 @@ export const NavLink = styled.a`
   letter-spacing: 0.5px;
   transition:
     color 0.3s ease,
-    text-shadow 0.3s ease;
-  cursor: pointer;
+    text-shadow 0.3s ease,
+    opacity 0.3s ease;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   display: inline-block;
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 
-  &:hover {
-    color: #e62429;
-    text-shadow: 0 0 10px rgba(230, 36, 41, 0.3);
-  }
+  ${({ disabled }) =>
+    !disabled &&
+    `
+    &:hover {
+      color: #e62429;
+      text-shadow: 0 0 10px rgba(230, 36, 41, 0.3);
+    }
+  `}
 `;
 
 // Styled Marvel red button

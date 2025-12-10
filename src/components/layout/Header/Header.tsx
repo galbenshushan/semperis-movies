@@ -18,7 +18,7 @@ export const Header: React.FC = () => {
     <HeaderContainer>
       <HeaderInner>
         <NavLeft>
-          <NavLink>Characters</NavLink>
+          <NavLink disabled={true}>Characters</NavLink>
           <NavLink as={Link} to="/">
             Movies
           </NavLink>
