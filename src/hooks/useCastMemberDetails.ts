@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { fetchPersonDetails } from '../services/tmdbService';
+import { fetchPersonDetails } from '../services/tmdb';
 import type { CastMember } from '../types/movie';
 
 interface UseCastMemberDetailsReturn {
