@@ -1,11 +1,11 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useMoviesListPage } from './useMoviesListPage';
+import { useMoviesStore } from './useMoviesStore';
 import { MoviesStatus } from '../utils/enums';
 import type { CastMember, MovieDetails } from '../types/movie';
 
 export interface UseSelectedMovieReturn {
-  selectedMovie: ReturnType<typeof useMoviesListPage>['selectedMovie'];
+  selectedMovie: MovieDetails | null;
   status: MoviesStatus;
   error: string | null;
   posterUrl: string | null;
@@ -30,8 +30,7 @@ export const useSelectedMovie = (): UseSelectedMovieReturn => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const storeReturn = useMoviesListPage();
-  const { selectedMovie, status, error, loadMovieDetails, setSelectedMovie } = storeReturn;
+  const { selectedMovie, status, error, loadMovieDetails, setSelectedMovie } = useMoviesStore();
 
   // Wrap loadMovieDetails and setSelectedMovie with useCallback to stabilize them
   // This prevents the useEffect below from re-running unnecessarily
