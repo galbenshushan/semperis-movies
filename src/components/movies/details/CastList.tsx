@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react';
+import { Tooltip } from '@mui/material';
+import { OpenInNew as ExpandIcon } from '@mui/icons-material';
 import type { CastMember } from '../../../types/movie';
 
 import {
   CastCharacter,
   CastContainer,
+  CastIconWrapper,
   CastItem,
   CastList as StyledCastList,
   CastName,
@@ -12,23 +15,31 @@ import {
 
 interface CastListProps {
   cast: CastMember[];
+  onCastMemberClick?: (castMember: CastMember) => void;
 }
 
 /**
  * CastList: Presentational component that displays movie cast members.
+ * Supports clicking on cast members to view detailed information.
  */
-const CastListComponent: React.FC<CastListProps> = ({ cast }) => {
-  
+const CastListComponent: React.FC<CastListProps> = ({ cast, onCastMemberClick }) => {
   // Memoize rendered cast items to prevent re-creating them on every render
   const renderedCast = useMemo(
     () =>
       cast.map((member) => (
-        <CastItem key={member.id}>
-          <CastName>{member.name}</CastName>
-          {member.character && <CastCharacter>as {member.character}</CastCharacter>}
-        </CastItem>
+        <Tooltip key={member.id} title="Click to view details" arrow>
+          <CastItem onClick={() => onCastMemberClick?.(member)}>
+            <div>
+              <CastName>{member.name}</CastName>
+              {member.character && <CastCharacter>as {member.character}</CastCharacter>}
+            </div>
+            <CastIconWrapper>
+              <ExpandIcon />
+            </CastIconWrapper>
+          </CastItem>
+        </Tooltip>
       )),
-    [cast],
+    [cast, onCastMemberClick],
   );
 
   if (cast.length === 0) {
@@ -38,9 +49,7 @@ const CastListComponent: React.FC<CastListProps> = ({ cast }) => {
   return (
     <CastContainer>
       <CastTitle>Cast</CastTitle>
-      <StyledCastList>
-        {renderedCast}
-      </StyledCastList>
+      <StyledCastList>{renderedCast}</StyledCastList>
     </CastContainer>
   );
 };

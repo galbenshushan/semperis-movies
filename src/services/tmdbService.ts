@@ -334,3 +334,34 @@ export const fetchMovieDetails = async (movieId: number): Promise<MovieDetails |
     throw error;
   }
 };
+
+/**
+ * Fetch detailed information about a specific person (actor/cast member)
+ */
+export const fetchPersonDetails = async (personId: number) => {
+  try {
+    const url = `${BASE_URL}/person/${personId}?api_key=${API_KEY}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`TMDB API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return {
+      id: data.id,
+      name: data.name,
+      profilePath: data.profile_path,
+      birthday: data.birthday,
+      deathday: data.deathday,
+      placeOfBirth: data.place_of_birth,
+      biography: data.biography,
+      popularity: data.popularity,
+    };
+  } catch (error) {
+    console.error('Error fetching person details:', error);
+    throw error;
+  }
+};
+

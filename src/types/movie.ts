@@ -3,6 +3,10 @@ export interface CastMember {
   name: string;
   character?: string;
   profilePath?: string | null;
+  birthday?: string | null;
+  deathday?: string | null;
+  placeOfBirth?: string | null;
+  biography?: string;
 }
 
 export interface Movie {

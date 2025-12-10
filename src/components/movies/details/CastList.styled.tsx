@@ -20,15 +20,40 @@ export const CastList = styled.div`
 `;
 
 export const CastItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(230, 36, 41, 0.3);
   border-radius: 6px;
   transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
     background: rgba(230, 36, 41, 0.1);
     border-color: #e62429;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(230, 36, 41, 0.2);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+export const CastIconWrapper = styled.div`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e62429;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+
+  ${CastItem}:hover & {
+    opacity: 1;
   }
 `;
 

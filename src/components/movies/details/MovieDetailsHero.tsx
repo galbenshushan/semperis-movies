@@ -23,8 +23,10 @@ import {
   OverviewText,
 } from '../../../pages/MovieDetailsPage/MovieDetailsPage.styled';
 import { useMovieDetailsHeroMemo } from '../../../hooks/useMovieDetailsHeroMemo';
+import { useCastMemberDetails } from '../../../hooks/useCastMemberDetails';
 import { GenreChipList } from './GenreChipList';
 import { CastList } from './CastList';
+import { CastMemberModal } from './CastMemberModal';
 import type { CastMember } from '../../../types/movie';
 
 interface MovieDetailsHeroProps {
@@ -45,6 +47,7 @@ interface MovieDetailsHeroProps {
 
 /**
  * MovieDetailsHero: Presentational component that displays full movie details.
+ * All business logic is delegated to custom hooks.
  */
 const MovieDetailsHeroComponent: React.FC<MovieDetailsHeroProps> = ({
   backdropUrl,
@@ -61,6 +64,9 @@ const MovieDetailsHeroComponent: React.FC<MovieDetailsHeroProps> = ({
   onBack,
   onOpenTmdb,
 }) => {
+  const { selectedCastMember, isModalOpen, handleCastMemberClick, handleCloseModal } =
+    useCastMemberDetails();
+
   // Use the custom hook to get all memoized computed values
   const { ratingString, runtimeString, releaseYearString, memoizedOverview } =
     useMovieDetailsHeroMemo({
@@ -70,61 +76,70 @@ const MovieDetailsHeroComponent: React.FC<MovieDetailsHeroProps> = ({
       releaseYear,
       overview,
     });
+
   return (
-    <HeroSection $backdropUrl={backdropUrl}>
-      <HeroContent>
-        <MainGrid>
-          <PosterCard>
-            {posterUrl ? (
-              <PosterImage src={posterUrl} alt={title} loading="lazy" />
-            ) : (
-              <PosterPlaceholder>No Poster Available</PosterPlaceholder>
-            )}
-          </PosterCard>
+    <>
+      <HeroSection $backdropUrl={backdropUrl}>
+        <HeroContent>
+          <MainGrid>
+            <PosterCard>
+              {posterUrl ? (
+                <PosterImage src={posterUrl} alt={title} loading="lazy" />
+              ) : (
+                <PosterPlaceholder>No Poster Available</PosterPlaceholder>
+              )}
+            </PosterCard>
 
-          <HeroInfoSection>
-            <HeroTitle>{title}</HeroTitle>
+            <HeroInfoSection>
+              <HeroTitle>{title}</HeroTitle>
 
-            <HeroMetaRow>
-              <RatingBadge>{ratingString}</RatingBadge>
-              {runtime > 0 && <RuntimeText>{runtimeString}</RuntimeText>}
-              {releaseYear && <RuntimeText>{releaseYearString}</RuntimeText>}
-            </HeroMetaRow>
+              <HeroMetaRow>
+                <RatingBadge>{ratingString}</RatingBadge>
+                {runtime > 0 && <RuntimeText>{runtimeString}</RuntimeText>}
+                {releaseYear && <RuntimeText>{releaseYearString}</RuntimeText>}
+              </HeroMetaRow>
 
-            {formattedReleaseDate && <ReleaseDate>Released: {formattedReleaseDate}</ReleaseDate>}
+              {formattedReleaseDate && <ReleaseDate>Released: {formattedReleaseDate}</ReleaseDate>}
 
-            {genres.length > 0 && (
-              <div>
-                <GenresContainer>
-                  <GenreChipList genres={genres} />
-                </GenresContainer>
-              </div>
-            )}
+              {genres.length > 0 && (
+                <div>
+                  <GenresContainer>
+                    <GenreChipList genres={genres} />
+                  </GenresContainer>
+                </div>
+              )}
 
-            {memoizedOverview && (
-              <div>
-                <SynopsisTitle>Synopsis</SynopsisTitle>
-                <OverviewText>{memoizedOverview}</OverviewText>
-              </div>
-            )}
+              {memoizedOverview && (
+                <div>
+                  <SynopsisTitle>Synopsis</SynopsisTitle>
+                  <OverviewText>{memoizedOverview}</OverviewText>
+                </div>
+              )}
 
-            {director && (
-              <DirectorContainer>
-                <DirectorLabel>Director</DirectorLabel>
-                <DirectorName>{director}</DirectorName>
-              </DirectorContainer>
-            )}
+              {director && (
+                <DirectorContainer>
+                  <DirectorLabel>Director</DirectorLabel>
+                  <DirectorName>{director}</DirectorName>
+                </DirectorContainer>
+              )}
 
-            <CastList cast={cast} />
+              <CastList cast={cast} onCastMemberClick={handleCastMemberClick} />
 
-            <ButtonContainer>
-              <BackButton onClick={onBack}>← Back</BackButton>
-              <TMDBButton onClick={onOpenTmdb}>View on TMDB ↗</TMDBButton>
-            </ButtonContainer>
-          </HeroInfoSection>
-        </MainGrid>
-      </HeroContent>
-    </HeroSection>
+              <ButtonContainer>
+                <BackButton onClick={onBack}>← Back</BackButton>
+                <TMDBButton onClick={onOpenTmdb}>View on TMDB ↗</TMDBButton>
+              </ButtonContainer>
+            </HeroInfoSection>
+          </MainGrid>
+        </HeroContent>
+      </HeroSection>
+
+      <CastMemberModal
+        castMember={selectedCastMember}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 };
 
