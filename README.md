@@ -1,8 +1,8 @@
-# semperis-movies
+# semperis-Marvel-movies App
 
 A React + TypeScript application for browsing Marvel movies with filters and detailed movie information.
 
-**[Live Demo](https://galbenshushan.github.io/semperis-movies/)**
+**[Deployment URL](https://galbenshushan.github.io/semperis-movies/)**
 
 ## Run Locally
 
