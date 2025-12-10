@@ -5,4 +5,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/semperis-movies/',
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'mui': ['@mui/material', '@mui/icons-material'],
+          'vendor': ['react', 'react-dom', 'react-redux', 'react-router-dom'],
+          'state': ['@reduxjs/toolkit'],
+        }
+      }
+    }
+  }
 })
