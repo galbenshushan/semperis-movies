@@ -20,22 +20,25 @@ import {
   searchMovies as searchMoviesService,
   fetchMovieDetails,
   fetchGenres,
-} from '../services/tmdbService';
+} from '../services/tmdb';
 import * as selectors from '../store/moviesSelectors';
 import { MoviesStatus } from '../utils/enums';
+import { toErrorMessage } from '../utils/errorHandling';
 import type { MovieDetails } from '../types/movie';
 import type { PartialFilters } from '../types/filters';
 
 /**
  * Thin facade over Redux state and actions for movies.
- * Handles all Redux state selection and dispatches.
- * Performs async TMDB calls directly (not via thunks).
- * No side effects (useEffect) - this is a stateless hook.
+ * - Selects all relevant state from the store.
+ * - Provides async helpers that talk to TMDB services and update Redux.
+ * - Provides sync helpers that wrap dispatch for filter and selection changes.
+ *
+ * This hook itself is stateless and contains no effects.
  */
 export const useMoviesStore = () => {
   const dispatch = useAppDispatch();
 
-  // Select all state
+  // State selection
   const movies = useAppSelector(selectors.selectMovies);
   const filteredMovies = useAppSelector(selectors.selectFilteredMovies);
   const selectedMovie = useAppSelector(selectors.selectSelectedMovie);
@@ -48,17 +51,36 @@ export const useMoviesStore = () => {
   const filters = useAppSelector(selectors.selectFilters);
 
   /**
+   * Calculates pagination for the popular movies flow.
+   * TMDB discover endpoint usually caps results. Here we assume 500 max results
+   * with 20 items per page, which yields 25 pages total.
+   * This can be adjusted later if the API usage changes.
+   */
+  const calculatePopularPagination = (page: number) => {
+    const maxResults = 500;
+    const pageSize = 20;
+    const total = Math.ceil(maxResults / pageSize);
+
+    return {
+      currentPage: page,
+      totalPages: total,
+      hasMore: page < total,
+    };
+  };
+
+  /**
    * Load popular Marvel movies for a given page.
-   * Fetches genres if not already loaded.
+   * Fetches genres once and reuses them.
    */
   const loadPopularMovies = useCallback(
     async (page: number = 1) => {
-      try {
-        dispatch(setStatus(MoviesStatus.Loading));
-        dispatch(setError(null));
+      dispatch(setStatus(MoviesStatus.Loading));
+      dispatch(setError(null));
 
+      try {
         // Fetch genres if not already loaded
         let currentGenres = genres;
+
         if (currentGenres.length === 0) {
           const genresData = await fetchGenres();
           currentGenres = genresData;
@@ -69,39 +91,34 @@ export const useMoviesStore = () => {
         const moviesData = await fetchPopularMarvelMovies(page, currentGenres);
         dispatch(setMovies(moviesData));
 
-        // Calculate pagination
-        const calculatedTotalPages = Math.ceil(500 / 20);
-        dispatch(
-          setPagination({
-            currentPage: 1,
-            totalPages: calculatedTotalPages,
-            hasMore: 1 < calculatedTotalPages,
-          }),
-        );
+        // Pagination for popular list
+        dispatch(setPagination(calculatePopularPagination(page)));
 
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load popular movies';
-        dispatch(setError(errorMessage));
+        dispatch(setError(toErrorMessage(err, 'Failed to load popular movies')));
         dispatch(setStatus(MoviesStatus.Failed));
       }
     },
     [dispatch, genres],
   );
 
+  /**
+   * Load the next page of popular Marvel movies and append to the list.
+   */
   const loadMorePopularMovies = useCallback(async () => {
+    if (status === MoviesStatus.Loading || !hasMore) {
+      return;
+    }
+
+    dispatch(setStatus(MoviesStatus.Loading));
+    dispatch(setError(null));
+
     try {
-      if (status === MoviesStatus.Loading || !hasMore) {
-        return;
-      }
-
-      dispatch(setStatus(MoviesStatus.Loading));
-      dispatch(setError(null));
-
       const nextPage = currentPage + 1;
       const moviesData = await fetchPopularMarvelMovies(nextPage, genres);
-      dispatch(appendMovies(moviesData));
 
+      dispatch(appendMovies(moviesData));
       dispatch(
         setPagination({
           currentPage: nextPage,
@@ -112,22 +129,22 @@ export const useMoviesStore = () => {
 
       dispatch(setStatus(MoviesStatus.Succeeded));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load more movies';
-      dispatch(setError(errorMessage));
+      dispatch(setError(toErrorMessage(err, 'Failed to load more movies')));
       dispatch(setStatus(MoviesStatus.Failed));
     }
   }, [dispatch, status, hasMore, currentPage, genres, totalPages]);
 
   /**
-   * Search movies by query and filters.
-   * Resets pagination to page 1.
+   * Search movies by current filters.
+   * Resets pagination to a single page of results.
+   * The actual search logic (query, year, rating, genre) is handled by the service.
    */
   const searchMovies = useCallback(
     async (page: number = 1) => {
-      try {
-        dispatch(setStatus(MoviesStatus.Loading));
-        dispatch(setError(null));
+      dispatch(setStatus(MoviesStatus.Loading));
+      dispatch(setError(null));
 
+      try {
         const moviesData = await searchMoviesService(
           filters.searchQuery,
           page,
@@ -139,7 +156,8 @@ export const useMoviesStore = () => {
 
         dispatch(setMovies(moviesData));
 
-        // Reset pagination for search results
+        // For search results we currently treat it as a single page set.
+        // If needed, this can be extended later to real server side pagination.
         dispatch(
           setPagination({
             currentPage: 1,
@@ -150,8 +168,7 @@ export const useMoviesStore = () => {
 
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to search movies';
-        dispatch(setError(errorMessage));
+        dispatch(setError(toErrorMessage(err, 'Failed to search movies')));
         dispatch(setStatus(MoviesStatus.Failed));
       }
     },
@@ -159,20 +176,19 @@ export const useMoviesStore = () => {
   );
 
   /**
-   * Load movie details by ID.
+   * Load movie details by TMDB ID.
    */
   const loadMovieDetails = useCallback(
     async (id: number) => {
-      try {
-        dispatch(setStatus(MoviesStatus.Loading));
-        dispatch(setError(null));
+      dispatch(setStatus(MoviesStatus.Loading));
+      dispatch(setError(null));
 
+      try {
         const details = await fetchMovieDetails(id);
         dispatch(setSelectedMovie(details));
         dispatch(setStatus(MoviesStatus.Succeeded));
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load movie details';
-        dispatch(setError(errorMessage));
+        dispatch(setError(toErrorMessage(err, 'Failed to load movie details')));
         dispatch(setStatus(MoviesStatus.Failed));
       }
     },
@@ -180,6 +196,7 @@ export const useMoviesStore = () => {
   );
 
   // Sync filter setters
+
   const setSearchQueryHandler = useCallback(
     (query: string) => {
       dispatch(setSearchQuery(query));
@@ -226,8 +243,13 @@ export const useMoviesStore = () => {
     [dispatch],
   );
 
-  return useMemo(() => {
-    return {
+  /**
+   * Public API of the hook.
+   * useMemo is used to keep a stable reference object and avoid unnecessary re renders.
+   * Dependencies are kept small (mostly primitives and IDs) to avoid over sensitivity.
+   */
+  return useMemo(
+    () => ({
       // State
       movies,
       filteredMovies,
@@ -254,34 +276,37 @@ export const useMoviesStore = () => {
       setSelectedMovie: setSelectedMovieHandler,
       updateFilters: updateFiltersHandler,
       clearSearch: clearSearchHandler,
-    };
-  }, [
-    // Only include primitives and small arrays
-    movies.length,
-    filteredMovies.length,
-    selectedMovie?.id,
-    genres.length,
-    status,
-    error,
-    currentPage,
-    totalPages,
-    hasMore,
-    filters.searchQuery,
-    filters.selectedGenreId,
-    filters.selectedYear,
-    filters.selectedRating,
-    loadPopularMovies,
-    loadMorePopularMovies,
-    searchMovies,
-    loadMovieDetails,
-    setSearchQueryHandler,
-    setSelectedGenreIdHandler,
-    setSelectedYearHandler,
-    setSelectedRatingHandler,
-    setSelectedMovieHandler,
-    updateFiltersHandler,
-    clearSearchHandler,
-  ]);
+    }),
+    [
+      // State dependencies
+      movies.length,
+      filteredMovies.length,
+      selectedMovie?.id,
+      genres.length,
+      status,
+      error,
+      currentPage,
+      totalPages,
+      hasMore,
+      filters.searchQuery,
+      filters.selectedGenreId,
+      filters.selectedYear,
+      filters.selectedRating,
+
+      // Handlers
+      loadPopularMovies,
+      loadMorePopularMovies,
+      searchMovies,
+      loadMovieDetails,
+      setSearchQueryHandler,
+      setSelectedGenreIdHandler,
+      setSelectedYearHandler,
+      setSelectedRatingHandler,
+      setSelectedMovieHandler,
+      updateFiltersHandler,
+      clearSearchHandler,
+    ],
+  );
 };
 
 export type MoviesStore = ReturnType<typeof useMoviesStore>;
