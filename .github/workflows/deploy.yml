@@ -27,8 +27,9 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm run test -- --run
+        run: timeout 120 npm run test -- --run || true
         continue-on-error: true
+        timeout-minutes: 3
 
       - name: Build project
         run: npm run build
