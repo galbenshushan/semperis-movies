@@ -20,37 +20,36 @@ const initialState: MoviesState = {
   selectedRating: null,
 };
 
-// Slice
-
 const moviesSlice = createSlice({
   name: 'movies',
   initialState,
   reducers: {
-    setSearchQuery: (state, action: PayloadAction<string>) => {
-      state.searchQuery = action.payload;
+    setSearchQuery: (state, { payload }: PayloadAction<string>) => {
+      state.searchQuery = payload;
     },
-    setSelectedGenreId: (state, action: PayloadAction<number | null>) => {
-      state.selectedGenreId = action.payload;
+    setSelectedGenreId: (state, { payload }: PayloadAction<number | null>) => {
+      state.selectedGenreId = payload;
     },
-    setSelectedYear: (state, action: PayloadAction<number | null>) => {
-      state.selectedYear = action.payload;
+    setSelectedYear: (state, { payload }: PayloadAction<number | null>) => {
+      state.selectedYear = payload;
     },
-    setSelectedRating: (state, action: PayloadAction<number | null>) => {
-      state.selectedRating = action.payload;
+    setSelectedRating: (state, { payload }: PayloadAction<number | null>) => {
+      state.selectedRating = payload;
     },
     clearSearch: (state) => {
       state.searchQuery = '';
     },
-    setSelectedMovie: (state, action: PayloadAction<MovieDetails | null>) => {
-      state.selectedMovie = action.payload;
+    setSelectedMovie: (state, { payload }: PayloadAction<MovieDetails | null>) => {
+      state.selectedMovie = payload;
     },
     resetMovies: (state) => {
       state.movies = [];
       state.currentPage = 1;
       state.hasMore = true;
     },
-    updateFilters: (state, action: PayloadAction<PartialFilters>) => {
-      const { query, year, minRating, genreId } = action.payload;
+    updateFilters: (state, { payload }: PayloadAction<PartialFilters>) => {
+      const { query, year, minRating, genreId } = payload;
+
       if (query !== undefined) {
         state.searchQuery = query;
       }
@@ -64,37 +63,33 @@ const moviesSlice = createSlice({
         state.selectedRating = minRating;
       }
     },
-    setMovies: (state, action: PayloadAction<Movie[]>) => {
-      state.movies = action.payload;
+    setMovies: (state, { payload }: PayloadAction<Movie[]>) => {
+      state.movies = payload;
     },
-    appendMovies: (state, action: PayloadAction<Movie[]>) => {
+    appendMovies: (state, { payload }: PayloadAction<Movie[]>) => {
       const existingIds = new Set(state.movies.map((m) => m.id));
-      const newMovies = action.payload.filter((m) => !existingIds.has(m.id));
-      state.movies = [...state.movies, ...newMovies];
+      const newMovies = payload.filter((m) => !existingIds.has(m.id));
+      state.movies.push(...newMovies);
     },
-    setGenres: (state, action: PayloadAction<Genre[]>) => {
-      state.genres = action.payload;
+    setGenres: (state, { payload }: PayloadAction<Genre[]>) => {
+      state.genres = payload;
     },
-    setStatus: (state, action: PayloadAction<MoviesStatus>) => {
-      state.status = action.payload;
+    setStatus: (state, { payload }: PayloadAction<MoviesStatus>) => {
+      state.status = payload;
     },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
+    setError: (state, { payload }: PayloadAction<string | null>) => {
+      state.error = payload;
     },
-    setConfigError: (state, action: PayloadAction<string | null>) => {
-      state.configError = action.payload;
+    setConfigError: (state, { payload }: PayloadAction<string | null>) => {
+      state.configError = payload;
     },
     setPagination: (
       state,
-      action: PayloadAction<{
-        currentPage: number;
-        totalPages: number;
-        hasMore: boolean;
-      }>,
+      { payload }: PayloadAction<{ currentPage: number; totalPages: number; hasMore: boolean }>,
     ) => {
-      state.currentPage = action.payload.currentPage;
-      state.totalPages = action.payload.totalPages;
-      state.hasMore = action.payload.hasMore;
+      state.currentPage = payload.currentPage;
+      state.totalPages = payload.totalPages;
+      state.hasMore = payload.hasMore;
     },
   },
 });

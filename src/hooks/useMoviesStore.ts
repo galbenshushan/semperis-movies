@@ -43,13 +43,13 @@ export const useMoviesStore = () => {
   const movies = useAppSelector(selectors.selectMovies);
   const filteredMovies = useAppSelector(selectors.selectFilteredMovies);
   const selectedMovie = useAppSelector(selectors.selectSelectedMovie);
-  const genres = useAppSelector(selectors.selectGenres);
-  const status = useAppSelector(selectors.selectStatus);
-  const error = useAppSelector(selectors.selectError);
+  const genres = useAppSelector((state) => state.movies.genres);
+  const status = useAppSelector((state) => state.movies.status);
+  const error = useAppSelector((state) => state.movies.error);
   const configError = useAppSelector((state) => state.movies.configError);
-  const currentPage = useAppSelector(selectors.selectCurrentPage);
-  const totalPages = useAppSelector(selectors.selectTotalPages);
-  const hasMore = useAppSelector(selectors.selectHasMore);
+  const currentPage = useAppSelector((state) => state.movies.currentPage);
+  const totalPages = useAppSelector((state) => state.movies.totalPages);
+  const hasMore = useAppSelector((state) => state.movies.hasMore);
   const filters = useAppSelector(selectors.selectFilters);
 
   /**
