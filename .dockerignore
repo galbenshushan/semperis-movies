@@ -20,4 +20,3 @@ coverage
 eslint.config.js
 vitest.config.ts
 vitest.setup.ts
-tsconfig.node.json
