@@ -27,27 +27,6 @@ export const ModalContent = styled.div`
     0 0 80px rgba(230, 36, 41, 0.3);
   outline: none;
 
-  /* Custom scrollbar */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(230, 36, 41, 0.6) transparent;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(230, 36, 41, 0.6);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(230, 36, 41, 0.8);
-    }
-  }
-
   @media (max-width: 768px) {
     width: 98%;
     max-height: 95vh;

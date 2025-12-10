@@ -1,12 +1,11 @@
 import React, { memo, type ReactNode, useMemo } from 'react';
+import { MenuItem, InputAdornment } from '@mui/material';
 import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
+  StyledFormControl,
+  StyledInputLabel,
+  StyledSelect,
+  StyledClearButton,
+} from './SelectFilter.styled';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface SelectFilterOption {
@@ -23,86 +22,75 @@ interface SelectFilterProps {
   formatLabel?: (option: SelectFilterOption) => ReactNode;
 }
 
-/**
- * SelectFilter: Reusable dropdown filter component with clear button.
- * Handles numeric values, custom options, and clear functionality.
- */
 export const SelectFilter: React.FC<SelectFilterProps> = memo(
   ({ label, value, onChange, options, placeholder, formatLabel }) => {
-    const filterOptions = useMemo(() => {
-      return typeof options === 'function' ? options() : options;
-    }, [options]);
+    const filterOptions = useMemo(
+      () => (typeof options === 'function' ? options() : options),
+      [options],
+    );
 
     const handleClear = () => {
       onChange(null);
     };
 
     return (
-      <FormControl variant="outlined" size="small" sx={{ minWidth: 150, flex: '0 1 auto' }}>
-        <InputLabel
-          sx={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            transition: 'color 0.2s ease',
-            '&.Mui-focused': {
-              color: '#ffffff',
-            },
-          }}
-        >
-          {label}
-        </InputLabel>
-        <Select
+      <StyledFormControl variant="outlined" size="small">
+        <StyledInputLabel>{label}</StyledInputLabel>
+
+        <StyledSelect
           value={value ? value.toString() : ''}
-          onChange={(e) => onChange(e.target.value ? parseInt(e.target.value, 10) : null)}
+          onChange={(e) => {
+            const val = e.target.value;
+            onChange(val ? parseInt(val as string, 10) : null);
+          }}
           label={label}
           endAdornment={
             value !== null ? (
               <InputAdornment position="end">
-                <IconButton
+                <StyledClearButton
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleClear();
                   }}
                   edge="end"
-                  sx={{
-                    marginRight: '4px',
-                    color: 'rgba(255, 255, 255, 0.6)',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      color: '#ffffff',
-                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    },
-                  }}
                 >
                   <CloseIcon fontSize="small" />
-                </IconButton>
+                </StyledClearButton>
               </InputAdornment>
             ) : undefined
           }
-          sx={{
-            color: '#ffffff',
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            borderRadius: '8px',
-            transition: 'all 0.2s ease',
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-              transition: 'border-color 0.2s ease',
+          MenuProps={{
+            PaperProps: {
+              sx: {
+                backgroundColor: '#000000',
+                color: '#ffffff',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                maxHeight: 320,
+                '& .MuiMenuItem-root': {
+                  backgroundColor: '#000000',
+                  color: '#ffffff',
+                  transition: 'background-color 0.2s ease',
+                },
+                '& .MuiMenuItem-root:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.08)',
+                },
+                '& .MuiMenuItem-root.Mui-selected': {
+                  backgroundColor: 'rgba(255,255,255,0.12) !important',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.2) !important',
+                  },
+                },
+              },
             },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(255, 255, 255, 0.4)',
+            anchorOrigin: {
+              vertical: 'bottom',
+              horizontal: 'left',
             },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#ffffff',
-            },
-            '&.Mui-focused': {
-              boxShadow: '0 0 0 3px rgba(255, 255, 255, 0.1)',
-            },
-            '& .MuiSvgIcon-root': {
-              color: 'rgba(255, 255, 255, 0.6)',
-              transition: 'color 0.2s ease',
-            },
-            '&:hover .MuiSvgIcon-root': {
-              color: 'rgba(255, 255, 255, 0.8)',
+            transformOrigin: {
+              vertical: 'top',
+              horizontal: 'left',
             },
           }}
         >
@@ -114,8 +102,8 @@ export const SelectFilter: React.FC<SelectFilterProps> = memo(
               {formatLabel ? formatLabel(option) : option.label}
             </MenuItem>
           ))}
-        </Select>
-      </FormControl>
+        </StyledSelect>
+      </StyledFormControl>
     );
   },
 );

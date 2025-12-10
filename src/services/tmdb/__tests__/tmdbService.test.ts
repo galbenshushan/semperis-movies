@@ -7,14 +7,15 @@ import {
   fetchPersonDetails,
 } from '../tmdbService';
 import * as tmdbClient from '../tmdbClient';
+import type { TMDBMovie } from '../../tmdbTypes';
 
 // Mock tmdbClient
 vi.mock('../tmdbClient', () => ({
   tmdbFetch: vi.fn(),
   buildDiscoverParams: vi.fn((params) => params),
   fetchDiscoverPages: vi.fn(),
-  filterMoviesByQuery: vi.fn((movies, query) =>
-    movies.filter((m: any) => m.title.toLowerCase().includes(query.toLowerCase()))
+  filterMoviesByQuery: vi.fn((movies: TMDBMovie[], query: string) =>
+    movies.filter((m: TMDBMovie) => m.title.toLowerCase().includes(query.toLowerCase())),
   ),
 }));
 
@@ -126,11 +127,13 @@ describe('tmdbService', () => {
       const result = await searchMovies('Iron', 1, 2008, 7.0, 28);
 
       expect(result).toHaveLength(1);
-      expect((tmdbClient.fetchDiscoverPages as ReturnType<typeof vi.fn>)).toHaveBeenCalled();
+      expect(tmdbClient.fetchDiscoverPages as ReturnType<typeof vi.fn>).toHaveBeenCalled();
     });
 
     test('throws error when search fails', async () => {
-      (tmdbClient.fetchDiscoverPages as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('Search failed'));
+      (tmdbClient.fetchDiscoverPages as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error('Search failed'),
+      );
 
       await expect(searchMovies('test')).rejects.toThrow('Search failed');
     });

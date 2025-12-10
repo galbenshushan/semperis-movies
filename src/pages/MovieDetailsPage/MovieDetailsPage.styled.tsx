@@ -9,26 +9,6 @@ export const PageWrapper = styled.div`
   color: #ffffff;
   position: relative;
   overflow-y: scroll;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-
-  /* Chrome, Safari and Opera */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(230, 36, 41, 0.6);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(230, 36, 41, 0.8);
-    }
-  }
 `;
 
 // Cinematic hero section with backdrop - contains ALL content
