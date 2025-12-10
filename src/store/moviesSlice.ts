@@ -2,25 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { MoviesStatus } from '../utils/enums';
 import type { Movie, MovieDetails } from '../types/movie';
 import type { PartialFilters } from '../types/filters';
-export interface Genre {
-  id: number;
-  name: string;
-}
-
-export interface MoviesState {
-  movies: Movie[];
-  selectedMovie: MovieDetails | null;
-  genres: Genre[];
-  currentPage: number;
-  totalPages: number;
-  hasMore: boolean;
-  status: MoviesStatus;
-  error: string | null;
-  searchQuery: string;
-  selectedGenreId: number | null;
-  selectedYear: number | null;
-  selectedRating: number | null;
-}
+import type { Genre, MoviesState } from './moviesTypes';
 
 const initialState: MoviesState = {
   movies: [],

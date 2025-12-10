@@ -33,7 +33,7 @@ export const useCastMemberDetails = (): UseCastMemberDetailsReturn => {
         birthday: personDetails.birthday,
         deathday: personDetails.deathday,
         placeOfBirth: personDetails.placeOfBirth,
-        biography: personDetails.biography,
+        biography: personDetails.biography ?? undefined,
         profilePath: personDetails.profilePath || castMember.profilePath,
       };
 
