@@ -3,13 +3,13 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { vi, describe, test, beforeEach, expect } from 'vitest';
 import { configureStore } from '@reduxjs/toolkit';
-import { MoviesListPage } from './MoviesListPage';
-import { moviesReducer } from '../../store/moviesSlice';
-import { MoviesStatus } from '../../utils/enums';
-import type { Movie } from '../../types/movie';
+import { MoviesListPage } from '../MoviesListPage';
+import { moviesReducer } from '../../../store/moviesSlice';
+import { MoviesStatus } from '../../../utils/enums';
+import type { Movie } from '../../../types/movie';
 
 // Mock the custom hook
-vi.mock('../../hooks/useMoviesListPage', () => ({
+vi.mock('../../../hooks/useMoviesListPage', () => ({
   useMoviesListPage: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-import { useMoviesListPage } from '../../hooks/useMoviesListPage';
+import { useMoviesListPage } from '../../../hooks/useMoviesListPage';
 
 const mockUseMoviesListPage = useMoviesListPage as ReturnType<typeof vi.fn>;
 

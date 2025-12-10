@@ -2,19 +2,19 @@ import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { vi, describe, test, beforeEach, expect } from 'vitest';
-import { useMoviesStore } from './useMoviesStore';
-import { moviesReducer } from '../store/moviesSlice';
-import { MoviesStatus } from '../utils/enums';
+import { useMoviesStore } from '../useMoviesStore';
+import { moviesReducer } from '../../store/moviesSlice';
+import { MoviesStatus } from '../../utils/enums';
 
 // Mock the TMDB service
-vi.mock('../services/tmdb', () => ({
+vi.mock('../../services/tmdb', () => ({
   fetchPopularMarvelMovies: vi.fn(),
   fetchGenres: vi.fn(),
   searchMovies: vi.fn(),
   fetchMovieDetails: vi.fn(),
 }));
 
-import * as tmdbService from '../services/tmdb';
+import * as tmdbService from '../../services/tmdb';
 
 const mockFetchPopularMarvelMovies = tmdbService.fetchPopularMarvelMovies as ReturnType<typeof vi.fn>;
 const mockFetchGenres = tmdbService.fetchGenres as ReturnType<typeof vi.fn>;

@@ -5,11 +5,11 @@ import {
   fetchGenres,
   fetchMovieDetails,
   fetchPersonDetails,
-} from './tmdbService';
-import * as tmdbClient from './tmdbClient';
+} from '../tmdbService';
+import * as tmdbClient from '../tmdbClient';
 
 // Mock tmdbClient
-vi.mock('./tmdbClient', () => ({
+vi.mock('../tmdbClient', () => ({
   tmdbFetch: vi.fn(),
   buildDiscoverParams: vi.fn((params) => params),
   fetchDiscoverPages: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('./tmdbClient', () => ({
 }));
 
 // Mock mappers
-vi.mock('./helpers/tmdbMappers', () => ({
+vi.mock('../helpers/tmdbMappers', () => ({
   mapTMDBMovieToMovie: vi.fn((tmdbMovie) => ({
     id: tmdbMovie.id,
     title: tmdbMovie.title,
