@@ -2,11 +2,8 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from './store';
 
 // Base selectors
-export const selectMoviesState = (state: RootState) => state.movies;
-
 export const selectMovies = (state: RootState) => state.movies.movies;
 export const selectSelectedMovie = (state: RootState) => state.movies.selectedMovie;
-export const selectSelectedMovieId = (state: RootState) => state.movies.selectedMovie?.id;
 export const selectGenres = (state: RootState) => state.movies.genres;
 export const selectStatus = (state: RootState) => state.movies.status;
 export const selectError = (state: RootState) => state.movies.error;
