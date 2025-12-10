@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { SelectFilter } from './SelectFilter';
-import type { Genre } from '../../../store/moviesSlice';
+import type { Genre } from '../../../store/moviesTypes';
 
 interface GenreFilterProps {
   options: Genre[];
