@@ -8,20 +8,10 @@ import { muiTheme } from './theme/muiTheme';
 import { store } from './store/store';
 import App from './App.tsx';
 
-const getBasename = () => {
-  // GitHub Pages: /semperis-movies/
-  // Local: /
-  const path = window.location.pathname;
-  if (path.startsWith('/semperis-movies')) {
-    return '/semperis-movies';
-  }
-  return '/';
-};
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter basename={getBasename()}>
+      <BrowserRouter basename="/semperis-movies/">
         <ThemeProvider theme={muiTheme}>
           <GlobalStyles />
           <App />

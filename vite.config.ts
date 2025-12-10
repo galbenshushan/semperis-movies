@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === 'true' ? '/semperis-movies/' : '/',
+  base: '/semperis-movies/',
   plugins: [react()],
   build: {
     rollupOptions: {
