@@ -104,6 +104,7 @@ export async function fetchDiscoverPages(
   stopCondition?: (movies: TMDBMovie[], pageCount: number) => boolean,
 ): Promise<TMDBMovie[]> {
   const allMovies: TMDBMovie[] = [];
+  const seenIds = new Set<number>();
   let currentPage = startPage;
   let pagesFetched = 0;
   let hasMorePages = true;
@@ -117,7 +118,14 @@ export async function fetchDiscoverPages(
       break;
     }
 
-    allMovies.push(...data.results);
+    // Add movies, filtering out duplicates by id
+    for (const movie of data.results) {
+      if (!seenIds.has(movie.id)) {
+        allMovies.push(movie);
+        seenIds.add(movie.id);
+      }
+    }
+
     pagesFetched++;
 
     // Check stop condition if provided

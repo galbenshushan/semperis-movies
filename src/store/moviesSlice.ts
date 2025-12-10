@@ -64,7 +64,16 @@ const moviesSlice = createSlice({
       }
     },
     setMovies: (state, { payload }: PayloadAction<Movie[]>) => {
-      state.movies = payload;
+      // Deduplicate movies by id when setting
+      const seenIds = new Set<number>();
+      const uniqueMovies = payload.filter((movie) => {
+        if (seenIds.has(movie.id)) {
+          return false;
+        }
+        seenIds.add(movie.id);
+        return true;
+      });
+      state.movies = uniqueMovies;
     },
     appendMovies: (state, { payload }: PayloadAction<Movie[]>) => {
       const existingIds = new Set(state.movies.map((m) => m.id));
