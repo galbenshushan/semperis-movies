@@ -10,7 +10,7 @@
     "lint": "eslint . --ext ts,tsx",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --run --reporter=dot",
     "test:ui": "vitest --ui",
     "deploy": "npm run build && gh-pages -d dist"
   },
