@@ -19,10 +19,10 @@ export const isNearBottom = (threshold: number = 300): boolean => {
  * @param delayMs - Minimum time (in milliseconds) between executions (default 1000ms)
  * @returns Throttled function
  */
-export const throttle = (callback: (...args: any[]) => void, delayMs = 1000) => {
+export const throttle = <T extends unknown[]>(callback: (...args: T) => void, delayMs = 1000) => {
   let lastCall = 0;
 
-  return (...args: any[]) => {
+  return (...args: T) => {
     const now = Date.now();
     if (now - lastCall >= delayMs) {
       lastCall = now;
