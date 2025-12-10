@@ -13,9 +13,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Set API key for build
-ARG VITE_TMDB_API_KEY=47acdc595ef154784a7346a111cab7da
-ENV VITE_TMDB_API_KEY=$VITE_TMDB_API_KEY
+# Copy .env file for build
+COPY .env .env
 
 # Build the project
 RUN npm run build
